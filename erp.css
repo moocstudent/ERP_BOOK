@@ -1,0 +1,259 @@
+/* =============================================================
+   erp.css — styles for the live business sandboxes (viz.jsx)
+   Loaded after styles.css; leans on the same design tokens.
+============================================================= */
+
+/* ---------- shared demo stage ---------- */
+.erp-stage {
+  position: relative;
+  min-height: 120px;
+  padding: 22px 20px;
+  background: var(--surface);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+}
+.erp-select {
+  font: 500 13px var(--f-mono);
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius);
+  padding: 4px 8px;
+}
+.erp-code {
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  background: var(--surface-2);
+  border: 1px solid var(--hairline);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  overflow-x: auto;
+  white-space: pre;
+  tab-size: 2;
+  font-family: var(--f-mono);
+}
+.erp-minibtn { padding: 4px 10px !important; font-size: 12px !important; }
+
+/* ---------- generic data table ---------- */
+.erp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: var(--bg);
+}
+.erp-table th, .erp-table td {
+  border: 1px solid var(--hairline-strong);
+  padding: 6px 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+.erp-table th {
+  font: 600 11px var(--f-mono);
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  background: var(--surface-2);
+  text-align: right;
+}
+.erp-table th:first-child, .erp-table td:first-child { text-align: left; }
+.erp-table td.neg { color: var(--accent); font-weight: 600; }
+.erp-table td.pos { color: var(--primary); font-weight: 600; }
+.erp-table tr.hl td { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.erp-table td.lbl { color: var(--muted); }
+
+/* ---------- document-flow cards ---------- */
+.erp-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+.erp-doc {
+  min-width: 150px;
+  flex: 1;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  padding: 10px 12px;
+  opacity: 0.45;
+  transition: opacity 0.3s, border-color 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+.erp-doc.on { opacity: 1; border-color: var(--ink); }
+.erp-doc.now { opacity: 1; border-color: var(--accent); box-shadow: 0 4px 16px -8px rgba(0,0,0,0.35); }
+.erp-doc .d-code { font: 600 10px var(--f-mono); letter-spacing: 0.12em; color: var(--muted); }
+.erp-doc .d-name { font: 600 14px var(--f-body); margin-top: 4px; }
+.erp-doc .d-sub { font-size: 11.5px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+.erp-flow-arrow {
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  color: var(--muted);
+  font-size: 16px;
+  flex: none;
+}
+.erp-doc-detail {
+  margin-top: 14px;
+  border: 1px solid var(--hairline-strong);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--bg);
+  padding: 14px 16px;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.erp-doc-detail .fields { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0; }
+.erp-doc-detail .fields span { font: 500 12px var(--f-mono); background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 4px; padding: 2px 8px; }
+.erp-posting {
+  margin-top: 8px;
+  font: 500 12.5px var(--f-mono);
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  border: 1px dashed var(--hairline-strong);
+  white-space: pre-line;
+}
+
+/* ---------- swimlanes ---------- */
+.erp-lanes { display: flex; flex-direction: column; gap: 6px; min-width: 560px; }
+.erp-lane { display: grid; grid-template-columns: 92px 1fr; gap: 8px; align-items: stretch; }
+.erp-lane .l-name {
+  display: flex; align-items: center; justify-content: center;
+  font: 600 11px var(--f-mono); letter-spacing: 0.08em;
+  color: var(--muted); background: var(--surface-2);
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 6px 4px; text-align: center;
+}
+.erp-lane .l-track { display: flex; gap: 6px; }
+.erp-lane .l-slot { flex: 1; min-height: 44px; border-radius: var(--radius); }
+.erp-lane .l-step {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 44px; padding: 4px 6px;
+  border: 1px solid var(--hairline-strong); border-radius: var(--radius);
+  background: var(--bg); font-size: 12px; text-align: center; line-height: 1.3;
+  opacity: 0.4; transition: all 0.3s;
+}
+.erp-lane .l-step.on { opacity: 1; border-color: var(--ink); }
+.erp-lane .l-step.now { opacity: 1; border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--bg)); }
+.erp-lane .l-step .s-no { font: 600 9.5px var(--f-mono); color: var(--muted); }
+
+/* ---------- trees (org / BOM / cost) ---------- */
+.erp-tree { font-size: 13.5px; line-height: 1.5; min-width: 380px; }
+.erp-tree .t-node { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: var(--radius); }
+.erp-tree .t-node:hover { background: var(--surface-2); }
+.erp-tree .t-kids { margin-left: 18px; padding-left: 14px; border-left: 1px dashed var(--hairline-strong); }
+.erp-tag {
+  font: 600 10px var(--f-mono); letter-spacing: 0.06em;
+  padding: 2px 7px; border-radius: 4px;
+  border: 1px solid var(--hairline-strong); color: var(--muted); background: var(--surface-2);
+}
+.erp-tag.acc { color: var(--accent); border-color: var(--accent); background: transparent; }
+.erp-tag.pri { color: var(--primary); border-color: var(--primary); background: transparent; }
+.erp-qty { font: 600 12.5px var(--f-mono); }
+
+/* ---------- tabs (material master) ---------- */
+.erp-tabs { display: flex; gap: 0; flex-wrap: wrap; border-bottom: 1px solid var(--ink); }
+.erp-tab {
+  padding: 8px 16px; font: 600 13px var(--f-body);
+  border: 1px solid transparent; border-bottom: none;
+  cursor: pointer; color: var(--muted); border-radius: var(--radius) var(--radius) 0 0;
+}
+.erp-tab.on { color: var(--ink); border-color: var(--ink); background: var(--bg); position: relative; top: 1px; }
+.erp-tabpane { border: 1px solid var(--ink); border-top: none; background: var(--bg); padding: 16px 18px; }
+.erp-kv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; font-size: 13px; }
+.erp-kv .k { color: var(--muted); font: 500 11.5px var(--f-mono); letter-spacing: 0.04em; }
+.erp-kv .pair { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px dotted var(--hairline-strong); padding: 4px 0; }
+@media (max-width: 640px) { .erp-kv { grid-template-columns: 1fr; } }
+
+/* ---------- T-accounts ---------- */
+.erp-taccounts { display: flex; flex-wrap: wrap; gap: 16px; }
+.erp-tacc { min-width: 190px; flex: 1; }
+.erp-tacc .t-title { text-align: center; font: 600 12.5px var(--f-body); border-bottom: 2px solid var(--ink); padding-bottom: 4px; }
+.erp-tacc .t-body { display: grid; grid-template-columns: 1fr 1fr; font: 500 12.5px var(--f-mono); }
+.erp-tacc .t-dr { border-right: 1px solid var(--ink); padding: 6px 8px; text-align: right; }
+.erp-tacc .t-cr { padding: 6px 8px; text-align: right; }
+.erp-tacc .t-head { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-align: center !important; }
+
+/* ---------- checklist (month-end / cutover) ---------- */
+.erp-check { display: flex; flex-direction: column; gap: 6px; }
+.erp-check .c-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 12px; border: 1px solid var(--hairline-strong); border-radius: var(--radius);
+  background: var(--bg); cursor: pointer; transition: all 0.25s;
+  font-size: 13.5px; line-height: 1.45;
+}
+.erp-check .c-item.done { opacity: 0.6; }
+.erp-check .c-item.done .c-name { text-decoration: line-through; }
+.erp-check .c-item.now { border-color: var(--accent); }
+.erp-check .c-box {
+  flex: none; width: 18px; height: 18px; margin-top: 1px;
+  border: 1.5px solid var(--ink); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+}
+.erp-check .c-item.done .c-box { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); }
+.erp-check .c-sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+/* ---------- bars & meters ---------- */
+.erp-bars { display: flex; flex-direction: column; gap: 10px; }
+.erp-bar-row { display: grid; grid-template-columns: 130px 1fr 70px; align-items: center; gap: 10px; font-size: 12.5px; }
+.erp-bar-row .b-track { height: 18px; background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 4px; overflow: hidden; }
+.erp-bar-row .b-fill { height: 100%; background: var(--primary); transition: width 0.35s; }
+.erp-bar-row .b-fill.acc { background: var(--accent); }
+.erp-bar-row .b-fill.warn { background: color-mix(in srgb, var(--accent) 55%, var(--surface-2)); }
+.erp-bar-row .b-val { font: 600 12px var(--f-mono); text-align: right; }
+
+/* ---------- canvas ---------- */
+.erp-canvas-wrap { background: var(--surface); border: 1px solid var(--hairline-strong); border-radius: var(--radius-lg); padding: 10px; }
+.erp-canvas-wrap canvas { display: block; width: 100%; height: auto; }
+
+/* ---------- pyramid ---------- */
+.erp-pyramid { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.erp-pyr-level {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border: 1px solid var(--ink); border-radius: var(--radius);
+  background: var(--bg); cursor: pointer; padding: 8px 10px;
+  font-size: 13px; text-align: center; line-height: 1.3; transition: all 0.25s;
+}
+.erp-pyr-level:hover { background: var(--surface-2); }
+.erp-pyr-level.on { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); }
+.erp-pyr-level .p-en { font: italic 500 11px var(--f-display); opacity: 0.75; }
+
+/* ---------- quadrant map ---------- */
+.erp-quad {
+  position: relative; width: 100%; height: 340px;
+  background:
+    linear-gradient(var(--hairline-strong) 1px, transparent 1px) 0 50% / 100% 50.5% no-repeat,
+    linear-gradient(90deg, var(--hairline-strong) 1px, transparent 1px) 50% 0 / 50.5% 100% no-repeat,
+    var(--surface);
+  border: 1px solid var(--hairline-strong); border-radius: var(--radius-lg);
+}
+.erp-quad .q-dot {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  cursor: pointer; z-index: 1;
+}
+.erp-quad .q-dot .dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--primary); border: 2px solid var(--ink);
+  transition: transform 0.2s;
+}
+.erp-quad .q-dot.sel .dot { background: var(--accent); transform: scale(1.35); }
+.erp-quad .q-dot .nm { font: 600 11px var(--f-body); background: var(--bg); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--hairline); white-space: nowrap; }
+.erp-quad .q-axis { position: absolute; font: 600 9.5px var(--f-mono); letter-spacing: 0.1em; color: var(--muted); }
+
+/* ---------- misc ---------- */
+.erp-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+.erp-legend .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: middle; border: 1px solid var(--ink); }
+.erp-btnrow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.erp-log {
+  margin-top: 12px; max-height: 180px; overflow-y: auto;
+  font: 500 12px var(--f-mono); line-height: 1.6;
+  background: var(--surface-2); border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 10px 12px;
+}
+.erp-note { margin-top: 10px; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
