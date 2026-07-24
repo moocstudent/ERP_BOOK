@@ -11,6 +11,8 @@ Toyota-style **andon** means: anyone who sees an abnormality can make line state
 
 Andon that never writes to the system only “lit up once”.
 
+The **signal-chain SVG** on top of the sandbox lights pull-cord → controller → MES → ERP with state; while red, ERP confirm freeze is visible on the chain.
+
 ### Recommended state machine
 
 ```

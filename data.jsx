@@ -1,5 +1,5 @@
 /* =========================================================
-   Curriculum data — 11 modules / 33 chapters
+   Curriculum data — 11 modules / 34 chapters
    ---------------------------------------------------------
    Metadata only (bilingual). The teaching content ("解释")
    for each chapter lives in content/<id>.<lang>.md and is
@@ -104,8 +104,8 @@ const MODULES = [
     zh: "工厂硬件与现场采集", en: "Factory Hardware & Floor Capture",
     tagline: { zh: "ERP 不会自己长眼睛——安灯、扫码枪、PLC 才是工厂端的神经末梢。", en: "ERP has no eyes of its own — andon, scanners and PLCs are the plant's nerve endings." },
     description: {
-      zh: "办公室录单撑不起真实工厂。本模块从硬件视角讲清:安灯、条码/RFID、工位终端、PLC/OPC-UA、电子秤、标签机、拣选灯、AGV、视觉检测等如何把现场事件写成 ERP/MES 单据;并对照 HARDWARE_BOOK 里的传感器、显示与总线,理解「设备层 → 边缘 → 管理账」的链路。",
-      en: "Typing in the office cannot run a real plant. This module maps factory hardware — andon, barcode/RFID, station terminals, PLC/OPC-UA, scales, labelers, pick-to-light, AGVs, vision — onto ERP/MES documents, bridging HARDWARE_BOOK sensors, displays and buses into the device → edge → management-ledger chain.",
+      zh: "办公室录单撑不起真实工厂。本模块从硬件图谱、安灯、扫码过账讲到协议分层:现场常用 RS-485/Modbus 把设备串起来,边缘网关再经 MQTT/HTTPS 对接 MES/ERP——对照 HARDWARE_BOOK 的传感与总线,把「电信号」翻译成「单据」。",
+      en: "Typing in the office cannot run a real plant. This module goes from hardware maps, andon and scan-to-post into protocol layering: RS-485/Modbus often links devices on the floor, then an edge gateway speaks MQTT/HTTPS to MES/ERP — bridging HARDWARE_BOOK sensing and buses so electrical signals become documents.",
     },
   },
 ];
@@ -823,6 +823,27 @@ const CHAPTERS = [
       { zh: "典型闭环:扫码收货、扫码发料、计件报工、循环盘点", en: "Typical loops: scan-GR, scan-issue, piece confirm, cycle count" },
       { zh: "可靠性:校验、幂等键、断网队列、时钟同步", en: "Reliability: validation, idempotency keys, offline queue, clock sync" },
       { zh: "从 HARDWARE_BOOK 到产线:MCU、总线与工业协议", en: "HARDWARE_BOOK to the line: MCU, buses, industrial protocols" },
+    ],
+  },
+  {
+    id: "erp34", code: "HW4", moduleId: "e11", difficulty: 3, hours: 5, prereq: ["erp33", "erp23"], viz: "protoStack",
+    props: ["RS-485", "Modbus", "MQTT", "OPC-UA", "边缘网关", "REST / API"],
+    title: { zh: "协议分层对接:485 连设备,MQTT 进 ERP", en: "Protocol Layers: RS-485 to Devices, MQTT into ERP" },
+    summary: {
+      zh: "传感器、仪表、PLC 之间常用 RS-485 + Modbus 互联;ERP 却听不懂 485 帧。中间必须有边缘网关做协议翻译,再经 MQTT 主题或 HTTPS API 把「业务事件」交给 MES/ERP。本章用可切换场景把分层画清楚,并给出主题命名、载荷字段与幂等约定的落地样例。",
+      en: "Sensors, meters and PLCs often talk RS-485 + Modbus to each other; ERP cannot parse 485 frames. An edge gateway must translate, then hand business events to MES/ERP over MQTT topics or HTTPS APIs. This chapter’s switchable scenes make the layers concrete, with topic naming, payload fields and idempotency conventions you can ship.",
+    },
+    objectives: [
+      { zh: "画出「现场总线层 / 边缘层 / 消息层 / ERP 事务层」四层图", en: "Draw the four layers: fieldbus / edge / messaging / ERP transaction" },
+      { zh: "说明为何设备侧用 485/Modbus,IT 侧用 MQTT/HTTPS", en: "Explain why the floor uses 485/Modbus and IT uses MQTT/HTTPS" },
+      { zh: "为一个报工事件设计 MQTT topic 与 JSON 载荷", en: "Design an MQTT topic and JSON payload for a confirmation event" },
+      { zh: "分清 OPC-UA、MQTT、REST 各自卡在哪一层", en: "Place OPC-UA, MQTT and REST on the correct layers" },
+    ],
+    outline: [
+      { zh: "现场层:RS-485 物理层与 Modbus RTU 寄存器", en: "Field layer: RS-485 physical + Modbus RTU registers" },
+      { zh: "边缘网关:轮询、映射工单号、本地缓存", en: "Edge gateway: poll, map WO ids, local buffer" },
+      { zh: "消息层:MQTT 主题树、QoS、与 REST 回调对比", en: "Message layer: MQTT topic tree, QoS, vs REST callbacks" },
+      { zh: "ERP 落账:订阅→校验→幂等过账→回执", en: "ERP posting: subscribe → validate → idempotent post → ack" },
     ],
   },
 ];

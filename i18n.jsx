@@ -69,8 +69,8 @@ const UI = {
   hero_l2a:    { zh: "再讲清", en: "then nail the" },
   hero_l2b:    { zh: "系统。", en: "system." },
   hero_sub:    {
-    zh: "一站式 ERP 自学地图:从 MRP 与业务闭环,到角色与多端 3D 协同,再到工厂安灯/扫码/PLC 等硬件如何把现场写进系统——并桥接 HARDWARE_BOOK。共 {M} 个模块、{C} 章。",
-    en: "A self-study ERP map: from MRP and business loops, through roles and multi-party 3D sync, to factory andon/scanners/PLCs that write the floor into the system — bridged to HARDWARE_BOOK. {M} modules, {C} chapters.",
+    zh: "一站式 ERP 自学地图:业务闭环、角色、多端 3D 协同、工厂硬件,以及 RS-485/Modbus→MQTT/HTTPS→ERP 的协议分层对接。共 {M} 个模块、{C} 章。",
+    en: "A self-study ERP map: business loops, roles, multi-party 3D sync, factory hardware, and protocol layering RS-485/Modbus→MQTT/HTTPS→ERP. {M} modules, {C} chapters.",
   },
   cta_start:   { zh: "从第一章开始 →", en: "Start chapter 1 →" },
   cta_howto:   { zh: "如何使用", en: "How it works" },

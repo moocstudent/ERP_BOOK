@@ -6,7 +6,7 @@
 Hardware event → edge validate/buffer → MES/ERP transaction → stock & cost ledger
 ```
 
-The sandbox’s four-stage pipe is exactly this. Drop a layer and weak networks or dirty labels will hurt you.
+The sandbox’s four-stage pipe is exactly this. Drop a layer and weak networks or dirty labels will hurt you. The **capture→post topology SVG** above lights nodes in step with the pipe.
 
 ### Choosing auto-ID
 
@@ -35,6 +35,8 @@ The sandbox’s four-stage pipe is exactly this. Drop a layer and weak networks 
 A scan engine is photo/imaging sense + decode silicon + UART/USB; PLC digital inputs are GPIO at industrial scale; the edge gateway normalizes many buses (industrial cousins of UART/I²C/SPI) into ERP-friendly HTTPS/queues.
 
 **Same discipline**: read the signal right before you drive the most expensive actuator — the posting.
+
+**HW4** next turns that into a shippable stack: **devices often speak RS-485/Modbus to each other; ERP often receives MQTT or HTTPS**, with a gateway translating and enforcing idempotency.
 
 ## Exercises
 

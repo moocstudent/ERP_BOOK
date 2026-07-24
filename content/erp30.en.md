@@ -10,6 +10,8 @@ Receive → Machine → Assemble → Pack → Ship (FG receipt)
 
 The sandbox token is **where one production order sits on the floor**; it advances only after a **successful confirmation** — “looks done” without a scan must not jump the token.
 
+The **station topology SVG** above the 3D line highlights the current station in sync; the orange dot is the token’s plane projection.
+
 ### Each confirmation moves three things at once
 
 | On confirm | Stock | Cost | Planning visibility |

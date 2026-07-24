@@ -473,3 +473,117 @@
   margin-bottom: 14px; padding: 4px 0;
 }
 .erp-scan-steps { display: flex; flex-direction: column; gap: 6px; }
+
+/* ---------- protocol stack (HW4) ---------- */
+.erp-proto-stack {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.erp-proto-layer {
+  text-align: left; cursor: pointer; width: 100%;
+  padding: 12px 14px 8px; border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius); background: var(--bg);
+  opacity: 0.55; transition: all 0.25s; position: relative;
+}
+.erp-proto-layer.on { opacity: 0.9; border-color: var(--ink); }
+.erp-proto-layer.now {
+  opacity: 1; border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg));
+  box-shadow: 0 4px 16px -8px rgba(0,0,0,0.25);
+}
+.erp-proto-layer .pl-title {
+  font: 600 14px var(--f-body); color: var(--ink);
+}
+.erp-proto-layer .pl-proto {
+  margin-top: 4px; font-size: 12px; color: var(--muted); letter-spacing: 0.04em;
+}
+.erp-proto-layer .pl-pipe {
+  text-align: center; color: var(--muted); font-size: 14px; margin-top: 4px; height: 14px;
+}
+.erp-proto-legend {
+  margin-top: 12px; font-size: 12px; color: var(--muted); line-height: 1.45;
+  padding: 8px 10px; border-left: 3px solid var(--accent); background: var(--surface-2);
+}
+
+/* ---------- SVG topology / flowchart ---------- */
+.erp-topo-wrap {
+  width: 100%; overflow: hidden; border: 1px solid var(--hairline);
+  border-radius: var(--radius); background:
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--surface-2) 88%, var(--accent) 12%),
+      var(--bg));
+}
+.erp-topo-svg, .erp-flow-svg, .erp-mini-topo {
+  display: block; width: 100%; height: auto;
+  color: var(--muted);
+}
+.erp-topo-zone.field {
+  fill: color-mix(in srgb, #6b7c5e 14%, transparent);
+  stroke: color-mix(in srgb, #6b7c5e 45%, var(--hairline));
+  stroke-width: 1;
+}
+.erp-topo-zone.it {
+  fill: color-mix(in srgb, var(--accent) 10%, transparent);
+  stroke: color-mix(in srgb, var(--accent) 40%, var(--hairline));
+  stroke-width: 1;
+}
+.erp-topo-zone-lab, .erp-topo-title {
+  fill: var(--muted); font: 600 11px var(--f-body); letter-spacing: 0.04em;
+}
+.erp-topo-title { font-size: 12px; fill: var(--ink); }
+.erp-topo-bus {
+  stroke: #6b7c5e; stroke-width: 3; stroke-linecap: round; opacity: 0.45;
+  transition: opacity 0.25s, stroke 0.25s;
+}
+.erp-topo-bus.hot { opacity: 1; stroke: var(--accent); }
+.erp-topo-edge {
+  stroke: var(--hairline-strong); stroke-width: 1.6; fill: none;
+  opacity: 0.35; transition: all 0.25s;
+}
+.erp-topo-edge.on { opacity: 0.75; stroke: var(--ink); }
+.erp-topo-edge.hot { opacity: 1; stroke: var(--accent); stroke-width: 2.4; }
+.erp-topo-edge-lab {
+  fill: var(--muted); font: 500 10px var(--f-mono, ui-monospace, monospace);
+}
+.erp-topo-node rect {
+  fill: var(--bg); stroke: var(--hairline-strong); stroke-width: 1.2;
+  transition: all 0.25s;
+}
+.erp-topo-node.on rect { stroke: var(--ink); opacity: 1; }
+.erp-topo-node.hot rect {
+  stroke: var(--accent); stroke-width: 2;
+  fill: color-mix(in srgb, var(--accent) 12%, var(--bg));
+  filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--accent) 35%, transparent));
+}
+.erp-topo-node-t {
+  fill: var(--ink); font: 600 11px var(--f-body);
+}
+.erp-topo-node-s {
+  fill: var(--muted); font: 500 9px var(--f-mono, ui-monospace, monospace);
+}
+.erp-topo-pkt {
+  fill: var(--accent);
+  animation: erp-pkt-pulse 1.2s ease-in-out infinite;
+}
+@keyframes erp-pkt-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+.erp-flow-box rect {
+  fill: var(--bg); stroke: var(--hairline-strong); stroke-width: 1.2;
+}
+.erp-flow-box.on rect { stroke: var(--ink); }
+.erp-flow-box.now rect {
+  stroke: var(--accent); stroke-width: 2;
+  fill: color-mix(in srgb, var(--accent) 10%, var(--bg));
+}
+.erp-flow-box .t1 {
+  fill: var(--ink); font: 600 11px var(--f-body);
+}
+.erp-flow-box .t2 {
+  fill: var(--muted); font: 500 9px var(--f-mono, ui-monospace, monospace);
+}
+.erp-flow-link {
+  stroke: var(--hairline-strong); stroke-width: 1.6; opacity: 0.4;
+}
+.erp-flow-link.on { stroke: var(--accent); opacity: 1; }
+.erp-mini-topo { min-height: 100px; }

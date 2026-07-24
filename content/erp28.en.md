@@ -14,6 +14,8 @@ Flowcharts excel at **internal** swimlanes; real delivery happens on a network w
 
 The 3D scene is not spectacle — it forces the question: **when the light flies, which document was created or posted?** Finish one loop and “multi-party sync” means a shared document state machine, not five private spreadsheets.
 
+Above the canvas sits an **SVG plane topology**: the same five-party network in 2D, with the active document edge highlighted and an orange packet on the live link — read it against the Three.js scene below.
+
 ### Document flight = status projection
 
 Each hop in the sandbox is an auditable system action:

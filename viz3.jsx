@@ -202,6 +202,124 @@ function makeRoad(a, b) {
 /* ============================================================
    COL1 · collabWorld — 3D five-end supply network
    ============================================================ */
+/* ---- SVG companions for E10 (topology / flow alongside 3D) ---- */
+function CollabTopoSvg({ nodes, steps, step, L }) {
+  const layout = {
+    SUP: { x: 40, y: 90 }, FAC: { x: 200, y: 40 }, OFF: { x: 280, y: 150 },
+    WH: { x: 420, y: 40 }, CUS: { x: 560, y: 100 },
+  };
+  const cur = steps[step];
+  const cx = (id) => layout[id].x + 50;
+  const cy = (id) => layout[id].y + 24;
+  return (
+    <svg className="erp-mini-topo" viewBox="0 0 680 210" role="img">
+      <defs>
+        <marker id="col-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+        </marker>
+      </defs>
+      <text x="24" y="22" className="erp-topo-zone-lab">
+        {L("五端单据拓扑（平面）· 下方 3D 是同一网络", "Five-party document topology (2D) · 3D below is the same net")}
+      </text>
+      {steps.map((s, i) => {
+        const a = layout[s.from], b = layout[s.to];
+        if (!a || !b) return null;
+        const hot = i === step;
+        const on = i <= step;
+        return (
+          <line key={i}
+            x1={a.x + 50} y1={a.y + 24} x2={b.x + 50} y2={b.y + 24}
+            className={`erp-topo-edge ${on ? "on" : ""} ${hot ? "hot" : ""}`}
+            markerEnd={hot ? "url(#col-arrow)" : undefined} />
+        );
+      })}
+      {nodes.map((n) => {
+        const p = layout[n.id];
+        const hot = cur.from === n.id || cur.to === n.id;
+        return (
+          <g key={n.id} className={`erp-topo-node ${hot ? "hot on" : "on"}`} transform={`translate(${p.x},${p.y})`}>
+            <rect width="100" height="48" rx="8" />
+            <text x="50" y="20" textAnchor="middle" className="erp-topo-node-t">{L(n.zh, n.en)}</text>
+            <text x="50" y="36" textAnchor="middle" className="erp-topo-node-s">{n.id}</text>
+          </g>
+        );
+      })}
+      <circle cx={(cx(cur.from) + cx(cur.to)) / 2} cy={(cy(cur.from) + cy(cur.to)) / 2} r="6" className="erp-topo-pkt" />
+      <text x="24" y="200" className="erp-topo-edge-lab">{cur.doc} · {L(cur.zh, cur.en)}</text>
+    </svg>
+  );
+}
+
+function E2eFlowSvg({ lanes, tick, timeline, L }) {
+  return (
+    <svg className="erp-flow-svg" viewBox="0 0 720 168" role="img">
+      <text x="24" y="20" className="erp-topo-zone-lab">
+        {L("端到端里程碑流程图 · 红点 = 当前时点", "E2E milestone flowchart · red = current tick")}
+      </text>
+      {timeline.map((t, i) => {
+        const x = 28 + i * 96;
+        const cls = i === tick ? "now" : i < tick ? "on" : "";
+        return (
+          <g key={i} className={`erp-flow-box ${cls}`}>
+            <rect x={x} y={36} width="84" height="40" rx="7" />
+            <text x={x + 42} y={52} textAnchor="middle" className="t1">{String(i + 1).padStart(2, "0")}</text>
+            <text x={x + 42} y={68} textAnchor="middle" className="t2">{L(t.zh, t.en)}</text>
+            {i < timeline.length - 1 && (
+              <line x1={x + 86} y1={56} x2={x + 94} y2={56} className={`erp-flow-link ${i < tick ? "on" : ""}`} />
+            )}
+          </g>
+        );
+      })}
+      {lanes.map((lane, i) => {
+        const x = 28 + i * 138;
+        const wait = lane.wait;
+        return (
+          <g key={lane.id} className={`erp-topo-node ${wait ? "hot" : "on"}`} transform={`translate(${x},100)`}>
+            <rect width="120" height="48" rx="8" />
+            <text x="60" y="20" textAnchor="middle" className="erp-topo-node-t">{L(lane.zh, lane.en)}</text>
+            <text x="60" y="36" textAnchor="middle" className="erp-topo-node-s">{lane.pct}%{wait ? " · BLOCK" : ""}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function FactoryLineSvg({ stations, st, L }) {
+  return (
+    <svg className="erp-mini-topo" viewBox="0 0 680 120" role="img">
+      <defs>
+        <marker id="ft-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+        </marker>
+      </defs>
+      <text x="24" y="22" className="erp-topo-zone-lab">
+        {L("产线工位拓扑 · 令牌跟报工走", "Line station topology · token follows confirms")}
+      </text>
+      {stations.map((s, i) => {
+        const x = 24 + i * 130;
+        return (
+          <g key={s.id}>
+            <g className={`erp-topo-node ${i < st ? "on" : ""} ${i === st ? "hot on" : ""}`} transform={`translate(${x},40)`}>
+              <rect width="110" height="48" rx="8" />
+              <text x="55" y="22" textAnchor="middle" className="erp-topo-node-t">{L(s.zh, s.en)}</text>
+              <text x="55" y="38" textAnchor="middle" className="erp-topo-node-s">{s.id}</text>
+            </g>
+            {i < stations.length - 1 && (
+              <line x1={x + 110} y1="64" x2={x + 130} y2="64"
+                className={`erp-topo-edge ${i < st ? "on hot" : ""}`} markerEnd="url(#ft-arrow)" />
+            )}
+          </g>
+        );
+      })}
+      <circle cx={24 + st * 130 + 55} cy={64} r="6" className="erp-topo-pkt" />
+    </svg>
+  );
+}
+
+/* ============================================================
+   COL1 · collabWorld — 3D multi-party collaboration map
+   ============================================================ */
 function CollabWorldViz() {
   const L = useL();
   const wrapRef = React.useRef(null);
@@ -305,6 +423,9 @@ function CollabWorldViz() {
 
   return (
     <div>
+      <div className="erp-topo-wrap" style={{ marginBottom: 10 }}>
+        <CollabTopoSvg nodes={NODES} steps={STEPS} step={step} L={L} />
+      </div>
       <div className="erp-3d-shell">
         <div className="erp-3d-canvas" ref={wrapRef} />
         <div className="erp-3d-legend">
@@ -409,6 +530,9 @@ function E2eProgressViz() {
   return (
     <div>
       <div className="erp-stage">
+        <div className="erp-topo-wrap" style={{ marginBottom: 12 }}>
+          <E2eFlowSvg lanes={sc.lanes} tick={tick} timeline={TIMELINE} L={L} />
+        </div>
         <div className="erp-e2e-head">
           <div>
             <div className="mono" style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--muted)" }}>SO-11040 · BIKE-26 × 500</div>
@@ -569,6 +693,9 @@ function FactoryTwinViz() {
 
   return (
     <div>
+      <div className="erp-topo-wrap" style={{ marginBottom: 10 }}>
+        <FactoryLineSvg stations={STATIONS} st={st} L={L} />
+      </div>
       <div className="erp-3d-shell">
         <div className="erp-3d-canvas" ref={wrapRef} />
         <div className="erp-3d-legend">
@@ -769,6 +896,9 @@ function AndonBoardViz() {
   return (
     <div>
       <div className="erp-stage">
+        <div className="erp-topo-wrap" style={{ marginBottom: 12 }}>
+          <AndonTopoSvg state={state} L={L} />
+        </div>
         <div className="erp-andon">
           <div className="erp-andon-tower">
             {["#c45c3e", "#b8892d", "#2f6b4f"].map((col, i) => (
@@ -873,6 +1003,9 @@ function ScanToPostViz() {
   return (
     <div>
       <div className="erp-stage">
+        <div className="erp-topo-wrap" style={{ marginBottom: 12 }}>
+          <ScanTopoSvg mode={mode} step={step} L={L} />
+        </div>
         <div className="erp-scan-pipe">
           {["HARDWARE", "EDGE", "MES/ERP", "LEDGER"].map((lab, i) => (
             <React.Fragment key={lab}>
@@ -915,6 +1048,428 @@ function ScanToPostViz() {
   );
 }
 
+/* ============================================================
+   HW4 · protoStack — SVG topology + RS-485/Modbus → MQTT → ERP
+   ============================================================ */
+function ProtoTopoSvg({ scn, step, L }) {
+  // Node layouts per scene (viewBox 0 0 720 340)
+  const MAP = {
+    A: {
+      zoneZh: "车间柜 / 现场网", zoneEn: "Cabinet / field net",
+      itZh: "IT / 云侧", itEn: "IT / cloud side",
+      nodes: [
+        { id: "sens", x: 70, y: 250, w: 88, h: 44, zh: "温湿度", en: "Temp/RH", sub: "Slave 1" },
+        { id: "meter", x: 180, y: 250, w: 88, h: 44, zh: "电表", en: "Meter", sub: "Slave 2" },
+        { id: "plc", x: 290, y: 250, w: 88, h: 44, zh: "PLC", en: "PLC", sub: "Slave 3" },
+        { id: "gw", x: 180, y: 140, w: 110, h: 52, zh: "边缘网关", en: "Edge GW", sub: "Modbus Master" },
+        { id: "mqtt", x: 420, y: 140, w: 110, h: 52, zh: "MQTT Broker", en: "MQTT Broker", sub: "QoS 1" },
+        { id: "mes", x: 560, y: 70, w: 100, h: 48, zh: "MES", en: "MES", sub: "Subscribe" },
+        { id: "erp", x: 560, y: 200, w: 100, h: 48, zh: "ERP", en: "ERP", sub: "Confirm API" },
+      ],
+      // edges: from→to, label, active when step >= layerIndex
+      edges: [
+        { a: "sens", b: "gw", via: [124, 250, 124, 192, 180, 166], lab: "RS-485", layer: 0 },
+        { a: "meter", b: "gw", via: [224, 250, 224, 192], lab: "", layer: 0 },
+        { a: "plc", b: "gw", via: [334, 250, 334, 192, 235, 166], lab: "Modbus", layer: 0 },
+        { a: "gw", b: "mqtt", via: [290, 166, 420, 166], lab: "Ethernet", layer: 1 },
+        { a: "mqtt", b: "mes", via: [530, 140, 560, 94], lab: "sub", layer: 2 },
+        { a: "mqtt", b: "erp", via: [530, 166, 560, 224], lab: "MQTT→API", layer: 2 },
+        { a: "erp", b: "erp", via: [610, 248, 610, 280], lab: "Posting", layer: 3, loop: true },
+      ],
+      // packet path waypoints per step (centers)
+      packet: [
+        [[334, 250], [235, 166]],           // field poll
+        [[235, 166], [290, 166]],           // at gateway map
+        [[290, 166], [475, 166]],           // mqtt publish
+        [[475, 166], [610, 224]],           // erp
+      ],
+      busY: 268,
+      busX1: 60, busX2: 390,
+      busLab: "RS-485 multi-drop",
+    },
+    B: {
+      zoneZh: "仓库现场", zoneEn: "Warehouse floor",
+      itZh: "ERP 侧", itEn: "ERP side",
+      nodes: [
+        { id: "gun", x: 80, y: 180, w: 100, h: 52, zh: "RF 枪", en: "RF gun", sub: "USB/Wi-Fi" },
+        { id: "app", x: 260, y: 180, w: 120, h: 52, zh: "WMS App", en: "WMS App", sub: "Validate" },
+        { id: "api", x: 460, y: 180, w: 120, h: 52, zh: "HTTPS API", en: "HTTPS API", sub: "REST" },
+        { id: "erp", x: 620, y: 180, w: 80, h: 52, zh: "ERP", en: "ERP", sub: "Mvt 101" },
+      ],
+      edges: [
+        { a: "gun", b: "app", via: [180, 206, 260, 206], lab: "scan chars", layer: 0 },
+        { a: "app", b: "api", via: [380, 206, 460, 206], lab: "JSON", layer: 1 },
+        { a: "api", b: "erp", via: [580, 206, 620, 206], lab: "POST", layer: 2 },
+        { a: "erp", b: "erp", via: [660, 232, 660, 270], lab: "GR/IR", layer: 3, loop: true },
+      ],
+      packet: [
+        [[130, 206], [320, 206]],
+        [[320, 206], [520, 206]],
+        [[520, 206], [660, 206]],
+        [[660, 206], [660, 250]],
+      ],
+      busY: null,
+    },
+    C: {
+      zoneZh: "车间以太网", zoneEn: "Shop Ethernet",
+      itZh: "IT / 云侧", itEn: "IT / cloud side",
+      nodes: [
+        { id: "cnc", x: 70, y: 160, w: 110, h: 56, zh: "CNC", en: "CNC", sub: "OPC-UA Server" },
+        { id: "gw", x: 260, y: 160, w: 120, h: 56, zh: "OPC 桥/网关", en: "OPC bridge", sub: "Subscribe" },
+        { id: "mqtt", x: 450, y: 100, w: 110, h: 50, zh: "MQTT", en: "MQTT", sub: "counts" },
+        { id: "erp", x: 450, y: 220, w: 110, h: 50, zh: "ERP", en: "ERP", sub: "Util / PM" },
+        { id: "wo", x: 610, y: 160, w: 90, h: 50, zh: "工单通道", en: "WO path", sub: "Scene A" },
+      ],
+      edges: [
+        { a: "cnc", b: "gw", via: [180, 188, 260, 188], lab: "OPC-UA", layer: 0 },
+        { a: "gw", b: "mqtt", via: [380, 160, 450, 125], lab: "pub", layer: 1 },
+        { a: "gw", b: "erp", via: [380, 200, 450, 245], lab: "rollup", layer: 2 },
+        { a: "mqtt", b: "erp", via: [505, 150, 505, 220], lab: "agg", layer: 2 },
+        { a: "erp", b: "wo", via: [560, 245, 610, 185], lab: "≠ piece CNF", layer: 3 },
+      ],
+      packet: [
+        [[125, 188], [320, 188]],
+        [[320, 188], [505, 125]],
+        [[505, 125], [505, 245]],
+        [[505, 245], [655, 185]],
+      ],
+      busY: null,
+    },
+  };
+  const m = MAP[scn];
+  const [t, setT] = React.useState(0);
+  React.useEffect(() => {
+    let raf = 0, t0 = performance.now();
+    const loop = (now) => {
+      setT(((now - t0) / 1000) % 1);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [scn, step]);
+
+  const path = m.packet[Math.min(step, m.packet.length - 1)];
+  const [p0, p1] = path;
+  const px = p0[0] + (p1[0] - p0[0]) * t;
+  const py = p0[1] + (p1[1] - p0[1]) * t;
+
+  const activeIds = new Set();
+  m.edges.forEach((e) => {
+    if (e.layer <= step) { activeIds.add(e.a); activeIds.add(e.b); }
+  });
+
+  return (
+    <svg className="erp-topo-svg" viewBox="0 0 720 340" role="img"
+      aria-label={L("硬件到 ERP 拓扑", "Hardware-to-ERP topology")}>
+      <defs>
+        <marker id="erp-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+        </marker>
+        <filter id="erp-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.5" result="b" />
+          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+      </defs>
+
+      {/* zone bands */}
+      <rect x="24" y="40" width={scn === "B" ? 360 : 390} height="280" rx="12" className="erp-topo-zone field" />
+      <rect x={scn === "B" ? 400 : 430} y="40" width={scn === "B" ? 296 : 266} height="280" rx="12" className="erp-topo-zone it" />
+      <text x="40" y="62" className="erp-topo-zone-lab">{L(m.zoneZh, m.zoneEn)}</text>
+      <text x={scn === "B" ? 416 : 446} y="62" className="erp-topo-zone-lab">{L(m.itZh, m.itEn)}</text>
+
+      {/* RS-485 bus line for scene A */}
+      {m.busY != null && (
+        <g>
+          <line x1={m.busX1} y1={m.busY} x2={m.busX2} y2={m.busY} className={`erp-topo-bus ${step === 0 ? "hot" : ""}`} />
+          <text x={(m.busX1 + m.busX2) / 2} y={m.busY + 18} textAnchor="middle" className="erp-topo-edge-lab">{m.busLab}</text>
+        </g>
+      )}
+
+      {/* edges */}
+      {m.edges.map((e, i) => {
+        const hot = e.layer === step;
+        const on = e.layer < step;
+        const pts = e.via;
+        let d = `M ${pts[0]} ${pts[1]}`;
+        for (let k = 2; k < pts.length; k += 2) d += ` L ${pts[k]} ${pts[k + 1]}`;
+        const midX = pts[pts.length - 4] != null ? (pts[pts.length - 4] + pts[pts.length - 2]) / 2 : pts[0];
+        const midY = pts[pts.length - 3] != null ? (pts[pts.length - 3] + pts[pts.length - 1]) / 2 - 8 : pts[1] - 8;
+        return (
+          <g key={i} className={`erp-topo-edge ${hot ? "hot" : ""} ${on ? "on" : ""}`}>
+            <path d={d} fill="none" markerEnd={e.loop ? undefined : "url(#erp-arrow)"} />
+            {e.lab ? <text x={midX} y={midY} textAnchor="middle" className="erp-topo-edge-lab">{e.lab}</text> : null}
+          </g>
+        );
+      })}
+
+      {/* nodes */}
+      {m.nodes.map((n) => {
+        const on = activeIds.has(n.id) || step >= 0;
+        const hot = (scn === "A" && step === 0 && (n.id === "plc" || n.id === "gw"))
+          || (scn === "A" && step === 1 && n.id === "gw")
+          || (scn === "A" && step === 2 && (n.id === "mqtt" || n.id === "gw"))
+          || (scn === "A" && step === 3 && (n.id === "erp" || n.id === "mqtt"))
+          || (scn === "B" && ["gun", "app", "api", "erp"][step] === n.id)
+          || (scn === "C" && step === 0 && (n.id === "cnc" || n.id === "gw"))
+          || (scn === "C" && step === 1 && (n.id === "gw" || n.id === "mqtt"))
+          || (scn === "C" && step === 2 && (n.id === "mqtt" || n.id === "erp"))
+          || (scn === "C" && step === 3 && (n.id === "erp" || n.id === "wo"));
+        return (
+          <g key={n.id} transform={`translate(${n.x},${n.y})`} className={`erp-topo-node ${hot ? "hot" : ""} ${on ? "on" : ""}`}>
+            <rect width={n.w} height={n.h} rx="8" />
+            <text x={n.w / 2} y={20} textAnchor="middle" className="erp-topo-node-t">{L(n.zh, n.en)}</text>
+            <text x={n.w / 2} y={36} textAnchor="middle" className="erp-topo-node-s">{n.sub}</text>
+          </g>
+        );
+      })}
+
+      {/* flying packet */}
+      <circle cx={px} cy={py} r="7" className="erp-topo-pkt" filter="url(#erp-glow)" />
+      <text x="24" y="28" className="erp-topo-title">
+        {L("交互拓扑 · 报文沿高亮路径飞行", "Topology · packet flies the highlighted path")}
+      </text>
+    </svg>
+  );
+}
+
+function ProtoFlowSvg({ layers, step, L }) {
+  const w = 720;
+  const boxW = 150;
+  const gap = 28;
+  const startX = 30;
+  const y = 48;
+  return (
+    <svg className="erp-flow-svg" viewBox="0 0 720 130" role="img">
+      <defs>
+        <marker id="erp-flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+        </marker>
+      </defs>
+      {layers.map((ly, i) => {
+        const x = startX + i * (boxW + gap);
+        const cls = i === step ? "now" : i < step ? "on" : "";
+        return (
+          <g key={ly.id} className={`erp-flow-box ${cls}`}>
+            <rect x={x} y={y} width={boxW} height={56} rx="8" />
+            <text x={x + boxW / 2} y={y + 24} textAnchor="middle" className="t1">{L(ly.zh, ly.en)}</text>
+            <text x={x + boxW / 2} y={y + 42} textAnchor="middle" className="t2">{ly.proto}</text>
+            {i < layers.length - 1 && (
+              <line x1={x + boxW + 4} y1={y + 28} x2={x + boxW + gap - 6} y2={y + 28}
+                className={`erp-flow-link ${i < step ? "on" : ""}`} markerEnd="url(#erp-flow-arrow)" />
+            )}
+          </g>
+        );
+      })}
+      <text x="30" y="22" className="erp-topo-zone-lab">{L("分层流程图（点击下方或图中节点步进）", "Layer flowchart (click nodes or controls to step)")}</text>
+    </svg>
+  );
+}
+
+function ProtoStackViz() {
+  const L = useL();
+  const [scn, setScn] = React.useState("A");
+  const [step, setStep] = React.useState(0);
+  const [playing, setPlaying] = React.useState(true);
+  const [view, setView] = React.useState("topo"); // topo | flow
+
+  const SCENES = {
+    A: {
+      zh: "A · PLC 计件:485/Modbus → MQTT → ERP",
+      en: "A · PLC pieces: 485/Modbus → MQTT → ERP",
+      layers: [
+        { id: "F", zh: "① 现场总线", en: "① Fieldbus", proto: "RS-485 + Modbus RTU",
+          detailZh: "网关(主站)轮询 PLC 从站 3:读保持寄存器 40001=本秒件数 12。总线上还有电表、温湿度从站——设备互连走 485,不直连 ERP。",
+          detailEn: "Gateway (master) polls PLC slave 3: holding reg 40001 = piece count 12. Meter & RH share the bus — devices interconnect on 485, never talk ERP directly.",
+          pkt: "01 03 9C 41 00 02 CRC…" },
+        { id: "E", zh: "② 边缘网关", en: "② Edge gateway", proto: "Map + validate + buffer",
+          detailZh: "寄存器 12 + 工位配置 → wo=WO-5521, op=0020;校验工单已下达;生成 eventId;断网则先落盘。",
+          detailEn: "Reg 12 + station config → wo=WO-5521, op=0020; WO must be released; mint eventId; buffer if offline.",
+          pkt: `{ "eventId":"gw01-…-0007", "wo":"WO-5521", "goodQty":12 }` },
+        { id: "M", zh: "③ 消息层", en: "③ Messaging", proto: "MQTT QoS1",
+          detailZh: "Publish topic plant/1000/line/A3/confirm。Broker 可被 MES 与中间件同时订阅。",
+          detailEn: "Publish topic plant/1000/line/A3/confirm. Broker may fan-out to MES and middleware.",
+          pkt: "PUBLISH plant/1000/line/A3/confirm" },
+        { id: "R", zh: "④ ERP 事务", en: "④ ERP transaction", proto: "Adapter → Confirm API",
+          detailZh: "适配器按 eventId 幂等;调用报工接口;倒冲材料、工时进成本;回 ACK。重复投递直接返回已处理。",
+          detailEn: "Adapter idempotent on eventId; confirm API; backflush + hours to cost; ACK. Dupes return already-processed.",
+          pkt: "201 CNF-88231 · idempotent OK" },
+      ],
+    },
+    B: {
+      zh: "B · RF 枪收货:终端 → HTTPS → ERP",
+      en: "B · RF-gun GR: terminal → HTTPS → ERP",
+      layers: [
+        { id: "F", zh: "① 采集终端", en: "① Capture terminal", proto: "USB-HID / Wi-Fi gun",
+          detailZh: "保管员扫 PO 条码与托盘标签;枪把字符送进 WMS App(不是 485 总线)。",
+          detailEn: "Clerk scans PO + pallet; gun injects chars into WMS app (not an RS-485 bus).",
+          pkt: "PO-7781 \\n ROH-WHEEL" },
+        { id: "E", zh: "② 终端 App / 边缘", en: "② App / light edge", proto: "Local validate",
+          detailZh: "App 校验 PO 行、容差、质检标识;组 JSON;可离线队列。",
+          detailEn: "App checks PO line, tolerance, QI flag; builds JSON; may queue offline.",
+          pkt: `{ "po":"PO-7781", "qty":100, "eventId":"gun9-…" }` },
+        { id: "M", zh: "③ 集成入口", en: "③ Integration entry", proto: "HTTPS REST",
+          detailZh: "POST /api/goods-receipts。要即时成功/失败提示操作员——REST 比 MQTT 更合适。",
+          detailEn: "POST /api/goods-receipts. Operator needs instant OK/fail — REST beats MQTT here.",
+          pkt: "POST /api/goods-receipts" },
+        { id: "R", zh: "④ ERP 过账", en: "④ ERP posting", proto: "Mvt 101 + GR/IR",
+          detailZh: "标准收货过账:库存↑、GR/IR 挂账;响应 201 给枪机蜂鸣成功音。",
+          detailEn: "Standard GR: stock↑, GR/IR; 201 makes the gun beep success.",
+          pkt: "201 GR-12044 · mvt 101" },
+      ],
+    },
+    C: {
+      zh: "C · 机床:OPC-UA → 网关 → MQTT",
+      en: "C · CNC: OPC-UA → gateway → MQTT",
+      layers: [
+        { id: "F", zh: "① 设备信息模型", en: "① Device information model", proto: "OPC-UA",
+          detailZh: "CNC 在车间以太网暴露节点:Running、PartCount、AlarmCode(不是 485)。",
+          detailEn: "CNC exposes Running, PartCount, AlarmCode on shop Ethernet (not 485).",
+          pkt: "ns=2;s=PartCount = 1540" },
+        { id: "E", zh: "② OPC 桥 / 网关", en: "② OPC bridge / gateway", proto: "Subscribe + map",
+          detailZh: "网关订阅 PartCount 变化;映射到设备号与成本中心;过滤抖动脉冲。",
+          detailEn: "Gateway subscribes PartCount changes; maps equipment + cost center; filters chatter.",
+          pkt: `{ "eq":"CNC-12", "delta":1, "eventId":"opc-…" }` },
+        { id: "M", zh: "③ 消息层", en: "③ Messaging", proto: "MQTT / Kafka",
+          detailZh: "高频计数可进 MQTT;聚合后的利用率事件再给 ERP,避免每件都打总账。",
+          detailEn: "High-freq counts on MQTT; roll up utilization events for ERP — don’t hit the GL per piece.",
+          pkt: "plant/1000/eq/CNC-12/count" },
+        { id: "R", zh: "④ ERP / 设备账", en: "④ ERP / equipment ledger", proto: "Util. + maint.",
+          detailZh: "ERP 收汇总:利用率、报警工单;件级报工仍走情景 A 的工单通道。",
+          detailEn: "ERP takes rollups: utilization, maint. orders; piece confirms still use scene A’s WO path.",
+          pkt: "EQ util 87% · PM notice" },
+      ],
+    },
+  };
+
+  const s = SCENES[scn];
+  const cur = s.layers[step];
+
+  React.useEffect(() => {
+    if (!playing) return undefined;
+    const id = setInterval(() => setStep((x) => (x + 1) % s.layers.length), 2600);
+    return () => clearInterval(id);
+  }, [playing, scn, s.layers.length]);
+
+  React.useEffect(() => { setStep(0); }, [scn]);
+
+  return (
+    <div>
+      <div className="erp-stage">
+        <div className="erp-topo-wrap">
+          {view === "topo"
+            ? <ProtoTopoSvg scn={scn} step={step} L={L} />
+            : <ProtoFlowSvg layers={s.layers} step={step} L={L} />}
+        </div>
+        <div className="erp-proto-stack" style={{ marginTop: 12 }}>
+          {s.layers.map((ly, i) => (
+            <button key={ly.id} type="button"
+              className={`erp-proto-layer ${i === step ? "now" : ""} ${i < step ? "on" : ""}`}
+              onClick={() => setStep(i)}>
+              <div className="pl-title">{L(ly.zh, ly.en)}</div>
+              <div className="pl-proto mono">{ly.proto}</div>
+              <div className="pl-pipe">{i < s.layers.length - 1 ? "↓" : ""}</div>
+            </button>
+          ))}
+        </div>
+        <div className="erp-doc-detail" style={{ marginTop: 12 }}>
+          <strong>{L(cur.zh, cur.en)} · {cur.proto}</strong>
+          <p style={{ margin: "8px 0" }}>{L(cur.detailZh, cur.detailEn)}</p>
+          <pre className="erp-code" style={{ marginTop: 8 }}>{cur.pkt}</pre>
+        </div>
+        <div className="erp-proto-legend mono">
+          {L("原则:现场协议(485/OPC…)留在左区车间网;IT 协议(MQTT/HTTPS)留在右区——拓扑上用颜色分区。",
+             "Rule: field protocols (485/OPC…) stay in the left shop zone; IT protocols (MQTT/HTTPS) stay right — zones are color-coded on the topology.")}
+        </div>
+      </div>
+      <div className="viz-ctrl" style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+        <Choice label={L("对接情景", "Integration scene")} value={scn}
+          onChange={(v) => { setScn(v); setPlaying(false); }}
+          options={Object.keys(SCENES).map((k) => ({ v: k, l: L(SCENES[k].zh, SCENES[k].en) }))} />
+        <Choice label={L("视图", "View")} value={view} onChange={setView}
+          options={[
+            { v: "topo", l: L("SVG 拓扑", "SVG topology") },
+            { v: "flow", l: L("分层流程", "Layer flowchart") },
+          ]} />
+        <button className="btn erp-minibtn" onClick={() => setPlaying((p) => !p)}>
+          {playing ? L("暂停动画", "Pause anim") : L("自动步进", "Auto step")}
+        </button>
+        <StepCtl cur={step} setCur={setStep} max={s.layers.length - 1} L={L} />
+      </div>
+      <div className="viz-readout">
+        {L("上图是可交互拓扑:橙点沿当前层路径飞行。情景 A 看清「485 多从站总线 → 网关 → MQTT 扇出 MES/ERP」;切到流程图视图可对照四层栈。",
+           "The diagram is interactive: the orange packet flies the active-layer path. Scene A shows multi-drop 485 → gateway → MQTT fan-out to MES/ERP; switch to the flowchart view for the four-layer stack.")}
+      </div>
+    </div>
+  );
+}
+
+/* ---- Andon / Scan SVG companions ---- */
+function AndonTopoSvg({ state, L }) {
+  const phase = state === "GREEN" || state === "FIX" ? 0 : state === "CALL" ? 1 : 2;
+  return (
+    <svg className="erp-mini-topo" viewBox="0 0 640 160" role="img">
+      <defs>
+        <marker id="ad-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+        </marker>
+      </defs>
+      {[
+        { x: 30, zh: "拉绳/IO", en: "Cord/IO", sub: "GPIO" },
+        { x: 170, zh: "安灯控制器", en: "Andon ctrl", sub: "MCU/PLC" },
+        { x: 320, zh: "MES", en: "MES", sub: "State machine" },
+        { x: 470, zh: "ERP", en: "ERP", sub: "Downtime/OEE" },
+      ].map((n, i) => (
+        <g key={i} className={`erp-topo-node ${i <= phase + 1 ? "on" : ""} ${i === phase + 1 || (phase === 0 && i === 0) ? "hot" : ""}`} transform={`translate(${n.x},50)`}>
+          <rect width="120" height="52" rx="8" />
+          <text x="60" y="22" textAnchor="middle" className="erp-topo-node-t">{L(n.zh, n.en)}</text>
+          <text x="60" y="40" textAnchor="middle" className="erp-topo-node-s">{n.sub}</text>
+        </g>
+      ))}
+      {[150, 300, 450].map((x, i) => (
+        <line key={i} x1={x} y1="76" x2={x + 20} y2="76"
+          className={`erp-topo-edge ${i < phase + 1 ? "on" : ""} ${i === phase ? "hot" : ""}`}
+          markerEnd="url(#ad-arrow)" />
+      ))}
+      <text x="30" y="28" className="erp-topo-zone-lab">{L("安灯信号链 · 红灯时 ERP 报工冻结", "Andon signal chain · ERP confirms freeze while red")}</text>
+    </svg>
+  );
+}
+
+function ScanTopoSvg({ mode, step, L }) {
+  const labels = {
+    GR: ["Gun", "Edge", "ERP API", "Stock"],
+    GI: ["Gun", "Edge", "ERP API", "WIP"],
+    CNF: ["PLC/Scan", "Gateway", "Confirm", "Cost"],
+    CC: ["Gun", "Approve", "ERP", "Adj."],
+  };
+  const labs = labels[mode] || labels.GR;
+  return (
+    <svg className="erp-mini-topo" viewBox="0 0 640 120" role="img">
+      <defs>
+        <marker id="sc-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+        </marker>
+      </defs>
+      {labs.map((lab, i) => {
+        const x = 30 + i * 155;
+        return (
+          <g key={i}>
+            <g className={`erp-topo-node ${i < step ? "on" : ""} ${i === Math.min(step, 3) ? "hot" : ""}`} transform={`translate(${x},40)`}>
+              <rect width="120" height="44" rx="8" />
+              <text x="60" y="28" textAnchor="middle" className="erp-topo-node-t">{lab}</text>
+            </g>
+            {i < 3 && (
+              <line x1={x + 120} y1="62" x2={x + 155} y2="62"
+                className={`erp-topo-edge ${i < step ? "on hot" : ""}`} markerEnd="url(#sc-arrow)" />
+            )}
+          </g>
+        );
+      })}
+      <text x="30" y="24" className="erp-topo-zone-lab">{L("采集→过账拓扑", "Capture→post topology")}</text>
+    </svg>
+  );
+}
+
 /* ---- register into viz2's VIZ map ---- */
 if (typeof VIZ !== "undefined") {
   VIZ.collabWorld = () => <CollabWorldViz />;
@@ -923,6 +1478,7 @@ if (typeof VIZ !== "undefined") {
   VIZ.hwCatalog = () => <HwCatalogViz />;
   VIZ.andonBoard = () => <AndonBoardViz />;
   VIZ.scanToPost = () => <ScanToPostViz />;
+  VIZ.protoStack = () => <ProtoStackViz />;
 }
 window.CollabWorldViz = CollabWorldViz;
 window.E2eProgressViz = E2eProgressViz;
@@ -930,3 +1486,4 @@ window.FactoryTwinViz = FactoryTwinViz;
 window.HwCatalogViz = HwCatalogViz;
 window.AndonBoardViz = AndonBoardViz;
 window.ScanToPostViz = ScanToPostViz;
+window.ProtoStackViz = ProtoStackViz;
