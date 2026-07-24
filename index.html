@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ERP 自学 · self-taught erp</title>
-<meta name="description" content="企业资源计划(ERP)的中英双语自学站:从 MRP 到云 ERP,主数据、采购到付款、订单到收款、生产计划、库存仓储、财务成本、实施与集成——每一章配可交互的业务沙盘演练。A bilingual self-study site for Enterprise Resource Planning — from MRP to cloud ERP: master data, procure-to-pay, order-to-cash, production planning, inventory, finance & costing, implementation & integration, each chapter with a live interactive business sandbox." />
+<meta name="description" content="企业资源计划(ERP)的中英双语自学站:主数据、采购到付款、订单到收款、生产计划、库存仓储、财务成本、实施集成、角色视角,以及供应商/工厂/办公室/仓库/客户多端协同的 3D 流转沙盘。A bilingual ERP self-study site with interactive sandboxes — including Three.js scenes of multi-party document flow across supplier, plant, office, warehouse and customer." />
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,8 +14,8 @@
   rel="stylesheet"
 />
 
-<link rel="stylesheet" href="styles.css?v=1" />
-<link rel="stylesheet" href="erp.css?v=1" />
+<link rel="stylesheet" href="styles.css?v=3" />
+<link rel="stylesheet" href="erp.css?v=3" />
 </head>
 <body>
   <div id="root"></div>
@@ -25,15 +25,19 @@
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 
+  <!-- Three.js (UMD) for E10 spatial sandboxes -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js" crossorigin="anonymous"></script>
+
   <!-- Markdown -->
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
 
   <!-- App scripts (order matters). ?v bumped on each release to bust caches. -->
-  <script type="text/babel" src="i18n.jsx?v=1"></script>
-  <script type="text/babel" src="data.jsx?v=1"></script>
-  <script type="text/babel" src="viz.jsx?v=1"></script>
-  <script type="text/babel" src="viz2.jsx?v=1"></script>
-  <script type="text/babel" src="pages.jsx?v=1"></script>
-  <script type="text/babel" src="app.jsx?v=1"></script>
+  <script type="text/babel" src="i18n.jsx?v=3"></script>
+  <script type="text/babel" src="data.jsx?v=3"></script>
+  <script type="text/babel" src="viz.jsx?v=3"></script>
+  <script type="text/babel" src="viz2.jsx?v=3"></script>
+  <script type="text/babel" src="viz3.jsx?v=3"></script>
+  <script type="text/babel" src="pages.jsx?v=3"></script>
+  <script type="text/babel" src="app.jsx?v=3"></script>
 </body>
 </html>

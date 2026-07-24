@@ -1,10 +1,10 @@
 /* =========================================================
-   Curriculum data — 8 modules / 24 chapters
+   Curriculum data — 10 modules / 30 chapters
    ---------------------------------------------------------
    Metadata only (bilingual). The teaching content ("解释")
    for each chapter lives in content/<id>.<lang>.md and is
    fetched on demand by the chapter page. `viz` names an
-   interactive business sandbox ("沙盘") from viz.jsx.
+   interactive business sandbox ("沙盘") from viz.jsx / viz2.jsx / viz3.jsx.
    `props` lists the key ERP concepts the chapter leans on.
    ========================================================= */
 
@@ -79,6 +79,24 @@ const MODULES = [
     description: {
       zh: "买对软件只是开始:蓝图设计、数据迁移、双轨并行、上线切换,每一步都有成熟方法论与著名翻车案例。本模块讲实施项目怎么管、ERP 如何与 MES/CRM/电商通过 API 与 EDI 集成,以及云化、选型与 AI 趋势。",
       en: "Buying the right software is only the start: blueprint design, data migration, parallel running and cutover each have mature methodologies — and famous disasters. This module covers how implementation projects are run, how ERP integrates with MES/CRM/e-commerce via APIs and EDI, and where cloud, selection and AI trends are heading.",
+    },
+  },
+  {
+    id: "e9", code: "E9", accent: "primary", level: 2,
+    zh: "角色视角:谁在用 ERP", en: "Role Perspectives: Who Uses ERP",
+    tagline: { zh: "同一套系统,总经理看例外,仓管员扫条码——角色不同,世界不同。", en: "Same system, different worlds: the CEO watches exceptions; the warehouse clerk scans barcodes." },
+    description: {
+      zh: "流程视角讲「事怎么走」,角色视角讲「人怎么用」。本模块按管理者与一线使用者拆开 ERP:总经理与 CFO 看什么仪表盘,销售/采购/计划/仓库/车间每天点哪些单据,权限与职责分离如何防舞弊——换一双鞋,再走进同一套系统。",
+      en: "Process views show how work flows; role views show how people use the system. This module opens ERP by persona: what dashboards the CEO and CFO watch, which documents sales/purchasing/planning/warehouse/shop-floor touch each day, and how authorization and segregation of duties stop fraud — same system, different shoes.",
+    },
+  },
+  {
+    id: "e10", code: "E10", accent: "accent", level: 2,
+    zh: "多端协同与立体流转", en: "Multi-party Sync & Spatial Flow",
+    tagline: { zh: "供应商、工厂、办公室、仓库、客户——五端同时动,ERP 是共享的进度条。", en: "Supplier, plant, office, warehouse, customer — five ends move at once; ERP is the shared progress bar." },
+    description: {
+      zh: "单据不只在公司内部流转,还穿过上下游与客户。本模块用 3D 场景与端到端进度板,把「一张订单如何同时点亮五端」可视化:谁在等、卡在哪张单、现场工位与系统状态怎样对齐。",
+      en: "Documents do not stay inside one company — they cross suppliers, plants and customers. This module uses a 3D scene and an end-to-end progress board to show how one order lights up five ends at once: who is waiting, which document is stuck, and how shop-floor stations stay aligned with system status.",
     },
   },
 ];
@@ -601,6 +619,136 @@ const CHAPTERS = [
       { zh: "TCO 模型:许可、实施、运维与隐性成本", en: "The TCO model: licenses, implementation, operations, hidden costs" },
       { zh: "选型方法:长名单到打分卡", en: "Selection method: long list to scorecard" },
       { zh: "趋势:组合式、低代码与 AI 助手", en: "Trends: composable, low-code, AI copilots" },
+    ],
+  },
+
+  /* ============ E9 角色视角 ============ */
+  {
+    id: "erp25", code: "ROLE1", moduleId: "e9", difficulty: 1, hours: 3, prereq: ["erp2"], viz: "roleDesk",
+    props: ["角色 / persona", "管理驾驶舱 / cockpit", "KPI", "例外管理 / exception Mgmt", "CFO / CEO"],
+    title: { zh: "高层与财务:驾驶舱里的 ERP", en: "Executives & Finance: ERP from the Cockpit" },
+    summary: {
+      zh: "总经理早上打开的不是采购订单,而是「交期违约 12 单、超期应收 ¥280 万、本月毛利率跌 1.2 个点」。CFO 盯现金与关账进度,总账会计盯分录与期间。本章从管理层与财务角色走进 ERP——他们几乎不录单据,却决定系统值不值得上。",
+      en: "The CEO does not open purchase orders in the morning — she opens '12 late deliveries, ¥2.8M overdue AR, margin down 1.2 pts this month'. The CFO watches cash and close progress; the GL accountant watches journals and periods. This chapter enters ERP through executive and finance roles — they rarely enter documents, yet decide whether the system is worth having.",
+    },
+    objectives: [
+      { zh: "说清管理层用 ERP 看的是例外与趋势,不是单据录入", en: "Explain that leaders use ERP for exceptions and trends, not data entry" },
+      { zh: "对照 CEO、CFO、总账会计各自的首页与核心 KPI", en: "Contrast the home screens and KPIs of CEO, CFO and GL accountant" },
+      { zh: "理解「下钻」:从红灯指标点进单据与责任人", en: "Understand drill-down: from a red KPI into documents and owners" },
+      { zh: "知道财务角色如何用期间控制与关账清单约束业务", en: "See how finance uses period control and close checklists to constrain ops" },
+    ],
+    outline: [
+      { zh: "角色 ≠ 部门:同一个人可兼多个角色,权限按角色授", en: "Role ≠ department: one person can wear many roles; rights follow roles" },
+      { zh: "CEO 驾驶舱:交付、毛利、库存周转与例外清单", en: "CEO cockpit: delivery, margin, inventory turns, exception list" },
+      { zh: "CFO 视角:现金、应收账龄、应付到期与关账进度", en: "CFO view: cash, AR aging, AP due, close progress" },
+      { zh: "总账会计:自动过账复核、期间开关与科目余额核对", en: "GL accountant: auto-post review, period switches, account reconciliation" },
+    ],
+  },
+  {
+    id: "erp26", code: "ROLE2", moduleId: "e9", difficulty: 2, hours: 4, prereq: ["erp25", "erp7", "erp10"], viz: "dayInLife",
+    props: ["销售 / sales", "采购 / buyer", "计划员 / planner", "仓管 / warehouse", "车间 / shop floor"],
+    title: { zh: "业务一线:一天里点哪些单据", en: "Front-line Ops: Which Documents a Day Touches" },
+    summary: {
+      zh: "销售员从报价到信用检查,采购员从申请到催货,计划员处理 MRP 例外,仓管员扫码收发,车间主任报工入库——一线用户才是 ERP「每天在跑」的人。跟着五个角色各过一天,看清菜单背后连着哪条闭环。",
+      en: "Sales moves from quote to credit check, buyers from requisition to expediting, planners clear MRP exceptions, warehouse clerks scan receipts and issues, supervisors confirm and receive — front-line users are who make ERP 'run every day'. Follow five roles through a workday and see which loop each menu tile belongs to.",
+    },
+    objectives: [
+      { zh: "为销售、采购、计划、仓库、车间各画出「一日关键动作」", en: "Sketch a day's key actions for sales, purchasing, planning, warehouse and shop floor" },
+      { zh: "把每个动作映射到 P2P / O2C / 计划到生产的具体单据", en: "Map each action onto a concrete P2P / O2C / plan-to-produce document" },
+      { zh: "识别一线最常踩的坑:跳过参照、事后补录、例外不处理", en: "Name the classic front-line traps: skipping references, backfilling, ignoring exceptions" },
+      { zh: "理解「超级用户」为何是上线后的关键角色", en: "Understand why the super user is the critical post-go-live role" },
+    ],
+    outline: [
+      { zh: "销售一天:报价 → 订单 → ATP/信用 → 催交与改单", en: "A sales day: quote → order → ATP/credit → expedite & change" },
+      { zh: "采购一天:申请转订单 → 跟催 → 价格异常处理", en: "A buyer day: PR→PO → expedite → price-exception handling" },
+      { zh: "计划一天:读 MRP 例外 → 改计划订单 → 重跑局部", en: "A planner day: MRP exceptions → reschedule → local re-run" },
+      { zh: "仓库与车间:扫码过账、差异处理与报工闭环", en: "Warehouse & shop floor: scan-posting, variance handling, confirmation loop" },
+    ],
+  },
+  {
+    id: "erp27", code: "ROLE3", moduleId: "e9", difficulty: 2, hours: 4, prereq: ["erp25", "erp8"], viz: "sodMatrix",
+    props: ["权限 / authorization", "职责分离 / SoD", "角色设计", "内控 / internal control", "审计轨迹"],
+    title: { zh: "权限与职责分离:谁能做什么", en: "Authorization & SoD: Who May Do What" },
+    summary: {
+      zh: "ERP 最危险的配置不是算错 MRP,而是「同一个人既能下采购订单又能做收货又能过发票」——舞弊的温床。本章讲角色与权限如何设计、职责分离(SoD)冲突怎么查、审计轨迹如何追溯每一次点击。",
+      en: "The most dangerous ERP misconfiguration is not a wrong MRP — it is giving one person create-PO, goods-receipt and invoice-post rights together: a fraud incubator. This chapter covers designing roles and authorizations, detecting segregation-of-duties conflicts, and how the audit trail reconstructs every click.",
+    },
+    objectives: [
+      { zh: "用「最小权限」原则为一个岗位设计角色包", en: "Design a role pack for a job under least privilege" },
+      { zh: "识别至少五组经典的职责分离冲突", en: "Identify at least five classic segregation-of-duties conflicts" },
+      { zh: "理解审批流与权限的分工:能做 ≠ 能批", en: "Separate 'can execute' from 'can approve' in workflows vs. rights" },
+      { zh: "知道审计如何从变更日志与单据流还原事实", en: "Know how audit reconstructs facts from change logs and document flow" },
+    ],
+    outline: [
+      { zh: "角色、配置文件与用户:三层权限模型", en: "Roles, profiles and users: the three-layer auth model" },
+      { zh: "职责分离矩阵:采购×收货×付款等冲突对", en: "SoD matrix: conflicting pairs like buy × receive × pay" },
+      { zh: "审批流:金额门槛、替补与紧急通道的风险", en: "Approval flows: amount thresholds, substitutes, emergency paths" },
+      { zh: "审计轨迹:谁、何时、改了什么、参照哪张单", en: "Audit trail: who, when, what changed, which document referenced" },
+    ],
+  },
+
+  /* ============ E10 多端协同与立体流转 ============ */
+  {
+    id: "erp28", code: "COL1", moduleId: "e10", difficulty: 1, hours: 4, prereq: ["erp2"], viz: "collabWorld",
+    props: ["多端协同", "供应链网络", "单据飞行 / doc flight", "3D 全景", "上下游"],
+    title: { zh: "立体协同全景:五端如何被一张单点亮", en: "Spatial Collaboration: One Order Lights Five Ends" },
+    summary: {
+      zh: "供应商园区、自家工厂、总部办公室、成品仓、客户门店——物理上分散,在 ERP 里却是同一条单据链上的节点。本章用可旋转的 3D 场景,看「单据粒子」如何在五端之间飞,每一步系统里留下什么状态。",
+      en: "Supplier park, own plant, HQ office, finished-goods warehouse, customer site — physically scattered, yet one document chain in ERP. This chapter’s rotatable 3D scene shows document particles flying between five ends, and which system status each hop leaves behind.",
+    },
+    objectives: [
+      { zh: "说出五端各自在 O2C/P2P 中扮演的节点角色", en: "Name each of the five ends as a node in O2C/P2P" },
+      { zh: "把「飞过的光点」映射到具体单据与过账", en: "Map each flying particle to a concrete document and posting" },
+      { zh: "理解外部伙伴看到的往往是门户/EDI,内核仍是 ERP", en: "See that partners often touch a portal/EDI while the core stays ERP" },
+      { zh: "识别跨端等待:谁在等谁的哪张单", en: "Spot cross-end waits: who waits on whose document" },
+    ],
+    outline: [
+      { zh: "五端地图:供应商、工厂、办公室、仓库、客户", en: "Five-end map: supplier, plant, office, warehouse, customer" },
+      { zh: "单据飞行:PO/ASN/SO/交货/发票在链上的轨迹", en: "Doc flight: PO/ASN/SO/delivery/invoice trajectories" },
+      { zh: "状态同步:一端过账,其余端立刻可见", en: "Status sync: one end posts, all ends see it" },
+      { zh: "门户与 EDI:伙伴不登录你的 ERP,仍写入同一事实", en: "Portal & EDI: partners never log into your ERP, yet write the same truth" },
+    ],
+  },
+  {
+    id: "erp29", code: "COL2", moduleId: "e10", difficulty: 2, hours: 4, prereq: ["erp28", "erp10", "erp7"], viz: "e2eProgress",
+    props: ["端到端进度", "协同看板", "阻塞 / blocker", "SLA", "单据流进度"],
+    title: { zh: "端到端进度板:卡在哪一端一目了然", en: "E2E Progress Board: See Which End Is Stuck" },
+    summary: {
+      zh: "客户只问「货到哪了」,内部却要同时盯采购在途、车间报工、仓库拣配、财务开票。本章做一张五泳道进度板:每端完成度、当前单据、阻塞原因与下一步责任人——这就是运营会议里 ERP 该投到墙上的画面。",
+      en: "Customers only ask 'where is my order?'; internally you must watch inbound POs, shop confirmations, picking and billing at once. This chapter builds a five-lane progress board: completion per end, current document, blocker and next owner — the picture ERP should throw on the war-room wall.",
+    },
+    objectives: [
+      { zh: "为一条订单画出五端进度百分比与关键单据", en: "Draw five-end % complete and key docs for one order" },
+      { zh: "用阻塞类型区分:缺料、信用、质检、匹配失败", en: "Classify blockers: shortage, credit, QI, match failure" },
+      { zh: "设计对外可视进度 vs 对内操作进度的信息差", en: "Design the info gap: customer-visible vs internal ops progress" },
+      { zh: "理解「进度」必须来自单据状态,不能靠人工填报", en: "Insist progress comes from document status, never manual fill-in" },
+    ],
+    outline: [
+      { zh: "进度定义:以单据状态机为唯一真相", en: "Defining progress: document state machine as sole truth" },
+      { zh: "五泳道看板:供应商→工厂→办公室→仓库→客户", en: "Five-lane board: supplier → plant → office → warehouse → customer" },
+      { zh: "阻塞与升级:红灯归属与 SLA", en: "Blockers & escalation: who owns the red light and the SLA" },
+      { zh: "对外门户:客户看到的里程碑如何从内部单据投影", en: "Customer portal: projecting milestones from internal docs" },
+    ],
+  },
+  {
+    id: "erp30", code: "COL3", moduleId: "e10", difficulty: 2, hours: 4, prereq: ["erp28", "erp15"], viz: "factoryTwin",
+    props: ["数字孪生", "工位 / station", "工单进度", "现场↔系统", "MES 边界"],
+    title: { zh: "工厂数字孪生:工位跑起来,工单才算真进度", en: "Factory Twin: Stations Move, Then the Order Is Real" },
+    summary: {
+      zh: "办公室里的工单状态若与车间工位脱节,计划、成本、交期全是幻觉。本章用 3D 工厂切片:收料、加工、组装、包装、出货五个工位,看一枚工单令牌如何移动,以及每次报工怎样回写 ERP——并分清 MES 实时采集与 ERP 管理账的边界。",
+      en: "If office work-order status drifts from shop stations, planning, cost and due dates are illusions. This chapter’s 3D factory slice — receive, machine, assemble, pack, ship — shows a work-order token moving and each confirmation writing back to ERP, and draws the line between MES real-time capture and ERP’s management ledger.",
+    },
+    objectives: [
+      { zh: "把工单状态映射到物理工位序列", en: "Map work-order status onto a physical station sequence" },
+      { zh: "解释报工如何同时推动库存、成本与计划可见性", en: "Explain how confirmations move stock, cost and planning visibility together" },
+      { zh: "分清 MES「秒级现场」与 ERP「管理闭环」", en: "Separate MES second-level floor from ERP management loop" },
+      { zh: "识别虚报工位进度对下游仓库与客户承诺的伤害", en: "See how fake station progress damages warehouse and customer promises" },
+    ],
+    outline: [
+      { zh: "工位链:从收料到出货的物理顺序", en: "Station chain: physical order from receive to ship" },
+      { zh: "令牌与报工:现场动作 → ERP 状态跃迁", en: "Token & confirmation: floor action → ERP state jump" },
+      { zh: "MES 与 ERP:谁记秒、谁记账", en: "MES vs ERP: who keeps the seconds, who keeps the books" },
+      { zh: "异常工位:停机、返工如何冻结下游进度", en: "Exception stations: how downtime and rework freeze downstream progress" },
     ],
   },
 ];

@@ -782,6 +782,329 @@ ${L("云", "Cloud")}:   ${L("实施", "impl.")} ¥${fm(clImpl)}k + ${L("订阅",
   );
 }
 
+/* ============================================================
+   ROLE1 · roleDesk — CEO / CFO / GL accountant cockpits
+   ============================================================ */
+function RoleDeskViz() {
+  const L = useL();
+  const [role, setRole] = React.useState("CEO");
+  const [drill, setDrill] = React.useState(null);
+  const ROLES = {
+    CEO: {
+      zh: "总经理 CEO", en: "CEO",
+      jobZh: "看例外与趋势,不录单据", enJob: "Watches exceptions & trends — never enters documents",
+      menus: [
+        { zh: "交期违约", en: "Late deliveries", v: "12", unit: L("单", ""), tone: "acc",
+          detailZh: "下钻 → 销售订单 SO-10992 / SO-11015… 责任:销售经理王敏 · 根因多为 ATP 未重算。", detailEn: "Drill → SO-10992 / SO-11015… Owner: sales mgr Wang. Root cause often ATP not re-run." },
+        { zh: "本月毛利率", en: "Gross margin MTD", v: "28.4%", unit: "", tone: "warn",
+          detailZh: "同比 −1.2 pt。下钻 → 产品组「入门车」价差科目冲高;采购价涨未及时转嫁。", detailEn: "−1.2 pt YoY. Drill → entry-bike product group price variance spiked; purchase rises not passed through." },
+        { zh: "库存周转", en: "Inventory turns", v: "6.1×", unit: "", tone: "ok",
+          detailZh: "目标 ≥ 6×,达标。下钻可见原材料周转偏慢、成品偏快——计划在压成品库存。", detailEn: "Target ≥ 6×, on track. Drill shows slow raw / fast FG turns — planning is compressing FG stock." },
+        { zh: "未清客户投诉", en: "Open complaints", v: "3", unit: L("件", ""), tone: "ok",
+          detailZh: "质量模块工单 QN-882 等。CEO 只需要「有没有超时未关」,细节交给质量经理。", detailEn: "Quality notices e.g. QN-882. CEO only needs 'any overdue?'; details stay with Quality." },
+      ],
+    },
+    CFO: {
+      zh: "财务总监 CFO", en: "CFO",
+      jobZh: "盯现金、风险与关账节奏", enJob: "Cash, risk and the close cadence",
+      menus: [
+        { zh: "可用现金", en: "Cash on hand", v: "¥4.2M", unit: "", tone: "ok",
+          detailZh: "含未兑现付款建议 ¥0.8M。下钻 → 银行科目余额 + 付款程序草稿。", detailEn: "Includes ¥0.8M unpaid payment proposal. Drill → bank GL + draft payment run." },
+        { zh: "超期应收", en: "Overdue AR", v: "¥2.8M", unit: "", tone: "acc",
+          detailZh: "账龄 > 60 天。最大户「城骑」¥1.1M——信用已冻结新单,催收任务在应收会计名下。", detailEn: "> 60 days. Top account Chengqi ¥1.1M — credit blocked; collection sits with AR clerk." },
+        { zh: "7 日内应付", en: "AP due in 7d", v: "¥1.6M", unit: "", tone: "warn",
+          detailZh: "已匹配待付 ¥1.2M + 未匹配发票 ¥0.4M。未匹配的拦在三单匹配,不会进付款建议。", detailEn: "¥1.2M matched + ¥0.4M unmatched. Unmatched stays behind three-way match, never reaches payment proposal." },
+        { zh: "月结进度", en: "Close progress", v: "5/9", unit: "", tone: "warn",
+          detailZh: "已完成:存货盘点、GR/IR 清理、折旧。卡住:银行对账差 ¥12k、费用计提未完。", detailEn: "Done: stock count, GR/IR clear, depreciation. Stuck: bank recon ¥12k diff, accruals unfinished." },
+      ],
+    },
+    GL: {
+      zh: "总账会计", en: "GL accountant",
+      jobZh: "复核自动过账、开关期间、对科目", enJob: "Review auto-posts, switch periods, reconcile accounts",
+      menus: [
+        { zh: "今日自动分录", en: "Auto journals today", v: "186", unit: L("笔", ""), tone: "ok",
+          detailZh: "来自收货/发货/报工。抽查 3 笔异常金额 > ¥50k——全部有单据流可点回。", detailEn: "From GR/GI/confirmations. Spot-check 3 lines > ¥50k — all drill back via document flow." },
+        { zh: "过账期间", en: "Posting periods", v: "07 开", unit: "", tone: "ok",
+          detailZh: "物流仅开本期;财务开本期+上期;特殊期间仅控制器角色。防倒签与迟到单据。", detailEn: "Logistics: current only; finance: current+prior; special periods: controller only. Stops back-dating and stragglers." },
+        { zh: "GR/IR 余额", en: "GR/IR balance", v: "¥390k", unit: "", tone: "warn",
+          detailZh: "收了货未到票。账龄 > 30 天的 ¥90k 需采购跟催发票,否则月结无法清零。", detailEn: "Received, not invoiced. >30d ¥90k needs purchasing to chase invoices or the close cannot clear." },
+        { zh: "待手工凭证", en: "Manual journals due", v: "4", unit: L("张", ""), tone: "ok",
+          detailZh: "计提、重分类、汇兑调整——唯一需要会计手工录的部分;业务单据绝不回头手录。", detailEn: "Accruals, reclass, FX — the only journals typed by hand; operational docs never get re-keyed." },
+      ],
+    },
+  };
+  const r = ROLES[role];
+  return (
+    <div>
+      <div className="erp-stage">
+        <div className="erp-role-head">
+          <div>
+            <div className="mono" style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--muted)" }}>{L("当前角色", "Signed in as")}</div>
+            <div style={{ fontFamily: "Noto Serif SC, serif", fontSize: 26, fontWeight: 500, marginTop: 4 }}>{L(r.zh, r.en)}</div>
+            <div style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>{L(r.jobZh, r.enJob)}</div>
+          </div>
+          <div className="erp-role-tabs">
+            {Object.keys(ROLES).map((k) => (
+              <button key={k} className={`erp-tab ${role === k ? "on" : ""}`}
+                onClick={() => { setRole(k); setDrill(null); }}
+                style={{ borderBottom: "1px solid var(--ink)" }}>
+                {L(ROLES[k].zh, ROLES[k].en)}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="erp-kpi-grid">
+          {r.menus.map((m, i) => (
+            <button key={i} className={`erp-kpi ${drill === i ? "sel" : ""} ${m.tone}`}
+              onClick={() => setDrill(drill === i ? null : i)}>
+              <div className="k-label">{L(m.zh, m.en)}</div>
+              <div className="k-val">{m.v}<span className="k-unit">{m.unit}</span></div>
+              <div className="k-hint">{L("点击下钻", "Click to drill")}</div>
+            </button>
+          ))}
+        </div>
+        {drill != null && (
+          <div className="erp-doc-detail" style={{ marginTop: 14 }}>
+            <strong>{L(r.menus[drill].zh, r.menus[drill].en)} · {L("下钻", "Drill-down")}</strong>
+            <p style={{ margin: "6px 0 0" }}>{L(r.menus[drill].detailZh, r.menus[drill].detailEn)}</p>
+          </div>
+        )}
+      </div>
+      <div className="viz-ctrl">
+        <Choice label={L("切换角色", "Switch role")} value={role} onChange={(v) => { setRole(v); setDrill(null); }}
+          options={Object.keys(ROLES).map((k) => ({ v: k, l: L(ROLES[k].zh, ROLES[k].en) }))} />
+      </div>
+      <div className="viz-readout">
+        {L("三个角色共用同一套数据库,却看到三张完全不同的「首页」。KPI 红了不是让领导录单,而是让领导问对的人、点进对的单据。这就是角色视角:权限裁剪菜单,职责决定关心什么数字。",
+           "Three roles share one database yet see three different home screens. A red KPI does not ask the boss to enter a document — it asks them to call the right owner and drill into the right document. That is the role view: rights trim the menu; duties decide which numbers matter.")}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   ROLE2 · dayInLife — a workday timeline per front-line role
+   ============================================================ */
+function DayInLifeViz() {
+  const L = useL();
+  const [role, setRole] = React.useState("SALES");
+  const [step, setStep] = React.useState(0);
+  const DAYS = {
+    SALES: {
+      zh: "销售员", en: "Sales rep", loop: "O2C",
+      steps: [
+        { t: "09:10", zh: "回客户询价,建报价单 QT-441", en: "Answer inquiry → create quote QT-441", doc: "QT", tipZh: "价格来自条件记录,不是手敲。", tipEn: "Price comes from condition records, not typing." },
+        { t: "10:05", zh: "客户确认 → 转销售订单 SO-11040", en: "Customer accepts → sales order SO-11040", doc: "SO", tipZh: "报价参照进订单,数量价格自动带出。", tipEn: "Quote references into the SO; qty/price auto-copy." },
+        { t: "10:08", zh: "系统跑 ATP + 信用检查", en: "System runs ATP + credit check", doc: "ATP", tipZh: "库存不够会建议改交期;超信用额度直接拦单。", tipEn: "Short stock suggests a new date; over-credit blocks the order." },
+        { t: "14:30", zh: "客户改数量 → 改单并重跑 ATP", en: "Qty change → amend SO & re-ATP", doc: "CHG", tipZh: "改单也是单据,不是电话口头答应。", tipEn: "A change is a document — never a verbal promise." },
+        { t: "16:40", zh: "查未清交货,催仓库优先拣配", en: "Check open deliveries; expedite picking", doc: "DN", tipZh: "销售不碰库存过账,只催责任人。", tipEn: "Sales never posts stock — only expedites owners." },
+      ],
+    },
+    BUYER: {
+      zh: "采购员", en: "Buyer", loop: "P2P",
+      steps: [
+        { t: "08:40", zh: "处理 MRP 抛出的采购申请 PR-9021", en: "Clear MRP requisition PR-9021", doc: "PR", tipZh: "申请是内部需求,还没有法律效力。", tipEn: "A PR is internal demand — not yet legally binding." },
+        { t: "09:20", zh: "转采购订单 PO-7781 发给供应商", en: "Convert to PO-7781 and send to vendor", doc: "PO", tipZh: "价格取自信息记录;超金额走审批流。", tipEn: "Price from info record; over-amount hits approval." },
+        { t: "11:00", zh: "跟催逾期 PO,更新确认交期", en: "Expedite late POs; update confirmed dates", doc: "ACK", tipZh: "确认交期喂回 MRP 的「在途供给」。", tipEn: "Confirmed dates feed MRP as planned supply." },
+        { t: "15:10", zh: "发票价格差异 → 改 PO 或退票", en: "Invoice price variance → change PO or reject", doc: "IV", tipZh: "三单匹配失败时,采购是价格差的责任人。", tipEn: "On three-way fail, purchasing owns the price gap." },
+        { t: "17:00", zh: "维护供应商评分(交期/质量自动汇总)", en: "Review vendor score (OTIF/quality auto-fed)", doc: "VM", tipZh: "分数来自收货与检验单据,采购改不了。", tipEn: "Scores come from GR & QI docs — buyers cannot edit them." },
+      ],
+    },
+    PLAN: {
+      zh: "计划员", en: "Planner", loop: "P2P*",
+      steps: [
+        { t: "08:15", zh: "读昨夜 MRP 例外清单(缺料/提前/推迟)", en: "Read overnight MRP exception list", doc: "EXC", tipZh: "MRP 只暴露矛盾,不替你做决策。", tipEn: "MRP exposes conflicts — it does not decide." },
+        { t: "09:30", zh: "把计划订单转成生产工单 / 采购申请", en: "Firm planned orders → production / PR", doc: "PL", tipZh: "「下达」才占用产能与触发下游。", tipEn: "Only a firm release consumes capacity and triggers downstream." },
+        { t: "11:40", zh: "与销售对齐:交期承诺 vs 产能", en: "Align with sales: promise date vs capacity", doc: "ATP", tipZh: "计划是销售与车间之间的翻译官。", tipEn: "Planning is the translator between sales and the floor." },
+        { t: "14:00", zh: "局部重跑 MRP(单物料/单工厂)", en: "Local MRP re-run (material / plant)", doc: "MRP", tipZh: "改了主数据或大单后要重跑,否则例外过时。", tipEn: "Re-run after master-data or big-order changes, or exceptions go stale." },
+        { t: "16:20", zh: "处理安全库存告警,评估是否改参数", en: "Safety-stock alerts → tweak parameters?", doc: "SS", tipZh: "参数是策略,不是「再多备一点」的随手改。", tipEn: "Parameters are strategy — not casual 'keep a bit more'." },
+      ],
+    },
+    WH: {
+      zh: "仓管员", en: "Warehouse clerk", loop: "INV",
+      steps: [
+        { t: "08:00", zh: "按交货单拣配、扫码发货过账", en: "Pick to delivery note; scan goods issue", doc: "GI", tipZh: "发货那一秒,库存与销货成本同时动。", tipEn: "At GI, stock and COGS move in the same second." },
+        { t: "10:30", zh: "采购到货:参照 PO 收货(101)", en: "Inbound: GR vs PO (mvt 101)", doc: "GR", tipZh: "无 PO 收货是内控红线——多数公司禁止。", tipEn: "GR without PO is a control red line — often banned." },
+        { t: "13:00", zh: "生产领料:按工单发料过账", en: "Issue components to production order", doc: "GI", tipZh: "账实相符的关键一跳:车间拿走必须过账。", tipEn: "Books=reality hinges here: what leaves must post." },
+        { t: "15:30", zh: "循环盘点:扫库位,差异进盘盈盘亏", en: "Cycle count: scan bin; variance to write-on/off", doc: "CC", tipZh: "差异要审批后才能过账,防「悄悄改库存」。", tipEn: "Variances need approval before posting — no silent stock edits." },
+        { t: "16:50", zh: "处理收货数量差,通知采购/质检", en: "Handle GR qty mismatch; ping buyer / QI", doc: "DIFF", tipZh: "仓管对数量负责,对价格不负责。", tipEn: "Warehouse owns quantity, never price." },
+      ],
+    },
+    SF: {
+      zh: "车间主任", en: "Shop-floor supervisor", loop: "MFG",
+      steps: [
+        { t: "07:50", zh: "看今日下达工单与缺料状态", en: "Review released orders & shortage status", doc: "WO", tipZh: "缺料工单不应开工——否则半成品堆场。", tipEn: "Don't start short-material orders — WIP piles up." },
+        { t: "09:00", zh: "工序开工报工(合格/工时)", en: "Confirm operation start (yield / hours)", doc: "CNF", tipZh: "报工驱动倒冲扣料与成本归集。", tipEn: "Confirmations drive backflush and cost collection." },
+        { t: "12:10", zh: "异常停机 → 记原因码,不虚报产量", en: "Downtime → reason code; no fake yield", doc: "NCR", tipZh: "虚报会污染效率差与标准成本。", tipEn: "Fake yield poisons efficiency variance and standards." },
+        { t: "15:40", zh: "完工确认 → 触发成品入库", en: "Final confirm → FG goods receipt", doc: "GR", tipZh: "完工入库让计划看到供给、财务看到存货。", tipEn: "FG receipt lets planning see supply and finance see stock." },
+        { t: "17:10", zh: "核对工单差异(量差/废品),关单", en: "Review order variances (qty/scrap); close", doc: "VAR", tipZh: "关单前差异要说得清,否则成本中心背锅。", tipEn: "Explain variances before close, or cost centers take the blame." },
+      ],
+    },
+  };
+  const d = DAYS[role];
+  const s = d.steps[step];
+  return (
+    <div>
+      <div className="erp-stage">
+        <div className="erp-role-head">
+          <div>
+            <div className="mono" style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--muted)" }}>
+              {L("闭环", "Loop")} · {d.loop}
+            </div>
+            <div style={{ fontFamily: "Noto Serif SC, serif", fontSize: 24, fontWeight: 500, marginTop: 4 }}>{L(d.zh, d.en)} · {L("工作日", "workday")}</div>
+          </div>
+          <div className="erp-role-tabs" style={{ flexWrap: "wrap" }}>
+            {Object.keys(DAYS).map((k) => (
+              <button key={k} className={`erp-tab ${role === k ? "on" : ""}`}
+                onClick={() => { setRole(k); setStep(0); }}
+                style={{ borderBottom: "1px solid var(--ink)" }}>
+                {L(DAYS[k].zh, DAYS[k].en)}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="erp-day-rail">
+          {d.steps.map((x, i) => (
+            <button key={i} className={`erp-day-node ${i === step ? "now" : i < step ? "on" : ""}`}
+              onClick={() => setStep(i)}>
+              <span className="t">{x.t}</span>
+              <span className="doc">{x.doc}</span>
+            </button>
+          ))}
+        </div>
+        <div className="erp-doc-detail">
+          <strong>{s.t} · {L(s.zh, s.en)}</strong>
+          <div className="fields" style={{ marginTop: 8 }}>
+            <span>{L("单据/动作", "Doc / action")} {s.doc}</span>
+            <span>{L("角色", "Role")} {L(d.zh, d.en)}</span>
+          </div>
+          <div className="erp-posting">💡 {L(s.tipZh, s.tipEn)}</div>
+        </div>
+      </div>
+      <div className="viz-ctrl">
+        <Choice label={L("一线角色", "Front-line role")} value={role}
+          onChange={(v) => { setRole(v); setStep(0); }}
+          options={Object.keys(DAYS).map((k) => ({ v: k, l: L(DAYS[k].zh, DAYS[k].en) }))} />
+      </div>
+      <StepCtl cur={step} setCur={setStep} max={d.steps.length - 1} L={L} />
+      <div className="viz-readout">
+        {L("五个角色的一天,覆盖了 O2C、P2P、计划、库存与制造——但没有人「拥有整条流程」。ERP 的价值,正是让这些人各自点自己的单据,而库存与账在后台自动对齐。超级用户则是上线后帮他们解卡的关键桥梁。",
+           "Five workdays cover O2C, P2P, planning, inventory and manufacturing — yet nobody 'owns' an entire loop. ERP's value is that each person posts their own documents while stock and ledgers align in the background. Super users are the bridge that unsticks them after go-live.")}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   ROLE3 · sodMatrix — segregation of duties conflicts
+   ============================================================ */
+function SodMatrixViz() {
+  const L = useL();
+  const ACTIONS = [
+    { id: "PR", zh: "建采购申请", en: "Create PR" },
+    { id: "PO", zh: "建/改采购订单", en: "Create/change PO" },
+    { id: "GR", zh: "收货过账", en: "Post GR" },
+    { id: "IV", zh: "过发票", en: "Post invoice" },
+    { id: "PAY", zh: "执行付款", en: "Run payment" },
+    { id: "SO", zh: "建销售订单", en: "Create SO" },
+    { id: "GI", zh: "发货过账", en: "Post GI" },
+    { id: "BL", zh: "开具发票", en: "Create billing" },
+    { id: "MD", zh: "改主数据/银行账号", en: "Change master / bank" },
+  ];
+  // conflicting pairs (keys always sorted alphabetically)
+  const CONFLICTS = {
+    "GR|PO": { zh: "买了又能收——虚收配合虚订", en: "Buy and receive — fictitious PO + GR" },
+    "IV|PO": { zh: "订了又能过票——价格自说自话", en: "Order and invoice — self-approved prices" },
+    "GR|IV": { zh: "收货+过票绕过三单匹配", en: "GR + invoice bypasses three-way match" },
+    "IV|PAY": { zh: "过票又能付款——经典侵占", en: "Invoice and pay — classic misappropriation" },
+    "PAY|PO": { zh: "下单到付款一人通吃", en: "Order-to-pay in one pair of hands" },
+    "GI|SO": { zh: "接单又发货——体外循环风险", en: "Order and ship — off-books diversion" },
+    "BL|GI": { zh: "发货又开票——收入时点可操纵", en: "Ship and bill — revenue timing games" },
+    "MD|PAY": { zh: "改供应商账号 + 付款 = 截留", en: "Change vendor bank + pay = diversion" },
+    "IV|MD": { zh: "改主数据又过票——幽灵供应商", en: "Change master + invoice — ghost vendor" },
+  };
+  const [on, setOn] = React.useState({ PO: true, GR: true, IV: false, PAY: false, PR: true, SO: false, GI: false, BL: false, MD: false });
+  const toggle = (id) => setOn((s) => ({ ...s, [id]: !s[id] }));
+  const active = ACTIONS.filter((a) => on[a.id]).map((a) => a.id);
+  const hits = [];
+  for (let i = 0; i < active.length; i++) {
+    for (let j = i + 1; j < active.length; j++) {
+      const key = [active[i], active[j]].sort().join("|");
+      if (CONFLICTS[key]) hits.push({ a: active[i], b: active[j], ...CONFLICTS[key] });
+    }
+  }
+  const pairKey = (a, b) => [a, b].sort().join("|");
+  return (
+    <div>
+      <div className="erp-stage">
+        <div style={{ marginBottom: 10, fontSize: 13.5, color: "var(--ink-soft)" }}>
+          {L("勾选「同一用户」被授予的权限,矩阵会标出职责分离(SoD)冲突。真实项目里用自动化规则扫全员,这里用手工勾选体会原则。",
+             "Tick the rights granted to one user; the matrix flags segregation-of-duties (SoD) conflicts. Real projects scan everyone with rules — here you feel the principle by hand.")}
+        </div>
+        <div className="erp-sod-actions">
+          {ACTIONS.map((a) => (
+            <label key={a.id} className={`erp-sod-chip ${on[a.id] ? "on" : ""}`}>
+              <input type="checkbox" checked={!!on[a.id]} onChange={() => toggle(a.id)} />
+              <span className="code">{a.id}</span>
+              <span>{L(a.zh, a.en)}</span>
+            </label>
+          ))}
+        </div>
+        <div className="erp-sod-wrap">
+          <table className="erp-table erp-sod-table">
+            <thead>
+              <tr>
+                <th></th>
+                {ACTIONS.map((a) => <th key={a.id}>{a.id}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {ACTIONS.map((row) => (
+                <tr key={row.id}>
+                  <td className="lbl">{row.id}</td>
+                  {ACTIONS.map((col) => {
+                    if (row.id === col.id) return <td key={col.id} style={{ background: "var(--surface-2)" }}>·</td>;
+                    const conf = CONFLICTS[pairKey(row.id, col.id)];
+                    const both = on[row.id] && on[col.id];
+                    return (
+                      <td key={col.id} className={conf ? (both ? "neg" : "lbl") : ""}
+                        title={conf ? L(conf.zh, conf.en) : ""}>
+                        {conf ? (both ? "✗" : "△") : ""}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="erp-note">
+          {L("△ = 潜在冲突对　✗ = 当前用户已同时拥有(违规)", "△ = potential conflict　✗ = this user currently holds both (violation)")}
+        </div>
+        {hits.length > 0 ? (
+          <div className="erp-doc-detail" style={{ marginTop: 12 }}>
+            <strong style={{ color: "var(--accent)" }}>{L(`发现 ${hits.length} 组冲突`, `${hits.length} conflict(s) found`)}</strong>
+            <ul style={{ margin: "8px 0 0", paddingLeft: 18, fontSize: 13.5 }}>
+              {hits.map((h, i) => (
+                <li key={i}><span className="mono">{h.a} × {h.b}</span> — {L(h.zh, h.en)}</li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div className="erp-note" style={{ color: "var(--primary)" }}>
+            {L("当前勾选无 SoD 冲突。试试同时打开「建/改采购订单 + 收货过账 + 过发票」。",
+               "No SoD conflict in the current selection. Try enabling Create/change PO + Post GR + Post invoice together.")}
+          </div>
+        )}
+      </div>
+      <div className="viz-readout">
+        {L("最小权限 + 职责分离是 ERP 内控的两根支柱。审批流解决「能不能批」,权限解决「能不能做」——两套机制都要配。审计轨迹则保证:就算有人越权,事后也能还原谁在何时点了什么。",
+           "Least privilege and segregation of duties are ERP control's twin pillars. Workflow answers 'may approve?'; authorization answers 'may execute?' — you need both. The audit trail ensures that even if someone overreaches, you can reconstruct who clicked what, when.")}
+      </div>
+    </div>
+  );
+}
+
 /* ---------------- registry & dispatch ---------------- */
 const VIZ = {
   erpEvolution:    () => <ErpEvolutionViz />,
@@ -808,6 +1131,9 @@ const VIZ = {
   implPlan:        () => <ImplPlanViz />,
   integration:     () => <IntegrationViz />,
   tcoCompare:      () => <TcoCompareViz />,
+  roleDesk:        () => <RoleDeskViz />,
+  dayInLife:       () => <DayInLifeViz />,
+  sodMatrix:       () => <SodMatrixViz />,
 };
 
 function Viz({ name }) {
