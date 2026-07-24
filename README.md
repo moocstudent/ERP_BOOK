@@ -18,6 +18,7 @@ A bilingual ERP self-study site: **11 modules, 34 chapters** — including facto
 - **HW1** 硬件图鉴 · **HW2** 安灯 · **HW3** 扫码到过账
 - **HW4** `protoStack` — **RS-485/Modbus 连设备, MQTT/HTTPS 进 ERP**(含 OPC-UA / RF 枪对照情景)
 - 交互拓扑用 **SVG 拓扑图 / 分层流程图** 展示，并与 E10 的 **Three.js 3D** 对照（五端单据、产线令牌）
+- 硬件接线与 MCU 侧实验对照姊妹站 **HARDWARE_BOOK H9**（扫码 UART/HID、安灯 GPIO、边缘网关迷你实验）
 
 ## 运行
 
