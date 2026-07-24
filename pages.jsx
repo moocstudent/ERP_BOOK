@@ -36,8 +36,8 @@ function useChapterContent(id, lang) {
   return state;
 }
 
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
-const roman_lc = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"];
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI"];
+const roman_lc = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi"];
 
 // ============== Ticker ==============
 const Ticker = () => {

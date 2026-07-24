@@ -1,5 +1,5 @@
 /* =========================================================
-   Curriculum data — 10 modules / 30 chapters
+   Curriculum data — 11 modules / 33 chapters
    ---------------------------------------------------------
    Metadata only (bilingual). The teaching content ("解释")
    for each chapter lives in content/<id>.<lang>.md and is
@@ -97,6 +97,15 @@ const MODULES = [
     description: {
       zh: "单据不只在公司内部流转,还穿过上下游与客户。本模块用 3D 场景与端到端进度板,把「一张订单如何同时点亮五端」可视化:谁在等、卡在哪张单、现场工位与系统状态怎样对齐。",
       en: "Documents do not stay inside one company — they cross suppliers, plants and customers. This module uses a 3D scene and an end-to-end progress board to show how one order lights up five ends at once: who is waiting, which document is stuck, and how shop-floor stations stay aligned with system status.",
+    },
+  },
+  {
+    id: "e11", code: "E11", accent: "primary", level: 2,
+    zh: "工厂硬件与现场采集", en: "Factory Hardware & Floor Capture",
+    tagline: { zh: "ERP 不会自己长眼睛——安灯、扫码枪、PLC 才是工厂端的神经末梢。", en: "ERP has no eyes of its own — andon, scanners and PLCs are the plant's nerve endings." },
+    description: {
+      zh: "办公室录单撑不起真实工厂。本模块从硬件视角讲清:安灯、条码/RFID、工位终端、PLC/OPC-UA、电子秤、标签机、拣选灯、AGV、视觉检测等如何把现场事件写成 ERP/MES 单据;并对照 HARDWARE_BOOK 里的传感器、显示与总线,理解「设备层 → 边缘 → 管理账」的链路。",
+      en: "Typing in the office cannot run a real plant. This module maps factory hardware — andon, barcode/RFID, station terminals, PLC/OPC-UA, scales, labelers, pick-to-light, AGVs, vision — onto ERP/MES documents, bridging HARDWARE_BOOK sensors, displays and buses into the device → edge → management-ledger chain.",
     },
   },
 ];
@@ -749,6 +758,71 @@ const CHAPTERS = [
       { zh: "令牌与报工:现场动作 → ERP 状态跃迁", en: "Token & confirmation: floor action → ERP state jump" },
       { zh: "MES 与 ERP:谁记秒、谁记账", en: "MES vs ERP: who keeps the seconds, who keeps the books" },
       { zh: "异常工位:停机、返工如何冻结下游进度", en: "Exception stations: how downtime and rework freeze downstream progress" },
+    ],
+  },
+
+  /* ============ E11 工厂硬件与现场采集 ============ */
+  {
+    id: "erp31", code: "HW1", moduleId: "e11", difficulty: 1, hours: 4, prereq: ["erp15", "erp30"], viz: "hwCatalog",
+    props: ["安灯 / andon", "扫码 / barcode", "RFID", "PLC", "工位终端", "物联网 / IoT"],
+    title: { zh: "工厂硬件图谱:ERP 需要哪些神经末梢", en: "Factory Hardware Map: The Nerve Endings ERP Needs" },
+    summary: {
+      zh: "没有硬件,ERP 在工厂只是墙上的显示器。本章系统枚举安灯、扫码枪、RFID 门、工位平板、PLC/OPC-UA、电子秤、标签机、拣选灯、AGV、视觉检测、考勤与边缘网关等,说明每类设备触发什么现场事件、最终写成哪张 ERP/MES 单据——并对照 HARDWARE_BOOK 的传感器、显示与总线。",
+      en: "Without hardware, ERP on the floor is just a wall monitor. This chapter catalogs andon, scanners, RFID gates, station tablets, PLC/OPC-UA, scales, labelers, pick-to-light, AGVs, vision, time clocks and edge gateways — what floor event each fires and which ERP/MES document it becomes — bridging HARDWARE_BOOK sensors, displays and buses.",
+    },
+    objectives: [
+      { zh: "按车间/仓库/质检/物流分区列出关键硬件清单", en: "List key hardware by shop / warehouse / QI / logistics zones" },
+      { zh: "把每类硬件映射到至少一种 ERP/MES 事务", en: "Map each hardware class to at least one ERP/MES transaction" },
+      { zh: "用 HARDWARE_BOOK 词汇解释传感器→MCU→总线→网关链路", en: "Explain sensor → MCU → bus → gateway in HARDWARE_BOOK terms" },
+      { zh: "区分「必须上」与「可后上」的硬件优先级", en: "Separate must-have vs later-wave hardware priorities" },
+    ],
+    outline: [
+      { zh: "为什么纯键盘录单撑不起工厂 ERP", en: "Why keyboard entry alone cannot run plant ERP" },
+      { zh: "硬件分区图谱:产线、仓储、质检、物流、基础设施", en: "Hardware zone map: line, warehouse, QI, logistics, infra" },
+      { zh: "设备 → 事件 → 单据对照表(安灯到 AGV)", en: "Device → event → document table (andon to AGV)" },
+      { zh: "与 HARDWARE_BOOK 的桥:传感、显示、总线、边缘计算", en: "Bridge to HARDWARE_BOOK: sense, display, bus, edge" },
+    ],
+  },
+  {
+    id: "erp32", code: "HW2", moduleId: "e11", difficulty: 2, hours: 4, prereq: ["erp31", "erp15"], viz: "andonBoard",
+    props: ["安灯系统", "停机码 / downtime", "原因码", "升级 / escalation", "OEE"],
+    title: { zh: "安灯与异常升级:红灯如何冻住工单进度", en: "Andon & Escalation: How a Red Light Freezes the Order" },
+    summary: {
+      zh: "安灯(Andon)不是装饰灯塔:拉绳/按钮/传感器触发后,产线灯塔变色、班组长到场、原因码入系统——停机开始计入 OEE,工单进度应冻结,必要时冻结下游交货承诺。本章演练安灯板与 ERP/MES 状态如何咬合。",
+      en: "Andon is not decorative: a cord/button/sensor turns the tower light, summons the lead, and posts a reason code — downtime hits OEE, the work order should freeze, and downstream delivery promises may freeze too. This chapter rehearses how the andon board locks with ERP/MES state.",
+    },
+    objectives: [
+      { zh: "描述安灯从触发到关闭的完整状态机", en: "Describe the andon state machine from pull to clear" },
+      { zh: "把停机原因码连接到工单、成本中心与 OEE", en: "Connect downtime reason codes to WO, cost center and OEE" },
+      { zh: "设计升级阶梯:工位 → 班组 → 车间 → 计划/销售", en: "Design escalation: station → team → plant → planning/sales" },
+      { zh: "说明虚报「绿灯」对客户门户与成本差异的伤害", en: "Show how fake green harms the portal and cost variances" },
+    ],
+    outline: [
+      { zh: "安灯硬件:灯塔、拉绳、工位屏、声光报警", en: "Andon hardware: towers, cords, station screens, alarms" },
+      { zh: "状态机:呼叫 → 响应 → 处置 → 关闭与防呆", en: "State machine: call → acknowledge → fix → close & poka-yoke" },
+      { zh: "写入系统:停机工时、原因码、冻结报工", en: "System write: downtime, reason codes, freeze confirmations" },
+      { zh: "升级与对外影响:何时改客户承诺", en: "Escalation & outward impact: when to re-promise the customer" },
+    ],
+  },
+  {
+    id: "erp33", code: "HW3", moduleId: "e11", difficulty: 2, hours: 4, prereq: ["erp31", "erp16"], viz: "scanToPost",
+    props: ["条码 / QR", "RFID", "自动过账", "防重 / idempotency", "边缘网关"],
+    title: { zh: "扫码到过账:一次采集如何写进库存与成本", en: "Scan-to-Post: One Capture Writes Stock and Cost" },
+    summary: {
+      zh: "仓库 RF 枪扫托盘、产线固定扫码头扫流转卡、RFID 门过料、电子秤回传重量、PLC 计件脉冲——这些采集若设计正确,会直接驱动收发货、报工与倒冲;若设计错误,就变成「先干活后补单」。本章走通「采集 → 校验 → 幂等写入 ERP」的链路。",
+      en: "RF-gun pallet scans, fixed mount scans of travelers, RFID gate passes, scale weights, PLC piece pulses — done right they drive GR/GI, confirmations and backflush; done wrong they become 'work first, backfill later'. This chapter walks capture → validate → idempotent ERP write.",
+    },
+    objectives: [
+      { zh: "为收货/发料/报工/盘点各选合适的自动识别方式", en: "Pick the right auto-ID mode for GR, issue, confirm, count" },
+      { zh: "解释扫描必须携带的最小数据(单号、物料、数量、库位)", en: "Name the minimum scan payload (doc, material, qty, bin)" },
+      { zh: "设计断网缓存与防重复过账", en: "Design offline buffer and anti-duplicate posting" },
+      { zh: "画出边缘网关在 PLC/扫码器与 ERP 之间的位置", en: "Place the edge gateway between PLC/scanners and ERP" },
+    ],
+    outline: [
+      { zh: "自动识别手段对照:一维码、二维码、RFID、视觉", en: "Auto-ID compared: 1D, 2D, RFID, vision" },
+      { zh: "典型闭环:扫码收货、扫码发料、计件报工、循环盘点", en: "Typical loops: scan-GR, scan-issue, piece confirm, cycle count" },
+      { zh: "可靠性:校验、幂等键、断网队列、时钟同步", en: "Reliability: validation, idempotency keys, offline queue, clock sync" },
+      { zh: "从 HARDWARE_BOOK 到产线:MCU、总线与工业协议", en: "HARDWARE_BOOK to the line: MCU, buses, industrial protocols" },
     ],
   },
 ];

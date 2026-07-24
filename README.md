@@ -1,8 +1,8 @@
 # ERP 自学 · self-taught erp
 
-中英双语的 ERP(企业资源计划)自学网站:**10 个模块、30 章**,每章「沙盘 + 解释」——含 MRP、三单匹配、复式记账、角色驾驶舱,以及 **Three.js 多端协同 3D 场景**(供应商 / 工厂 / 办公室 / 仓库 / 客户)。
+中英双语的 ERP(企业资源计划)自学网站:**11 个模块、33 章**,每章「沙盘 + 解释」——含 MRP、三单匹配、角色驾驶舱、Three.js 多端协同,以及**工厂硬件图谱**(安灯、扫码、RFID、PLC、AGV…与 HARDWARE_BOOK 对照)。
 
-A bilingual (zh/en) self-study site for ERP: **10 modules, 30 chapters**, each "sandbox + explanation" — including MRP, three-way match, double-entry, role cockpits, and **Three.js multi-party 3D scenes** (supplier / plant / office / warehouse / customer).
+A bilingual (zh/en) self-study site for ERP: **11 modules, 33 chapters**, each "sandbox + explanation" — including MRP, three-way match, role cockpits, Three.js multi-party scenes, and a **factory hardware map** (andon, scanners, RFID, PLC, AGV… bridged to HARDWARE_BOOK).
 
 ## 模块 Modules
 
@@ -18,21 +18,17 @@ A bilingual (zh/en) self-study site for ERP: **10 modules, 30 chapters**, each "
 | E8 | 实施与集成 Implementation & Integration | IMP1–IMP3 |
 | E9 | 角色视角 Role Perspectives | ROLE1–ROLE3 |
 | E10 | 多端协同与立体流转 Multi-party Sync | COL1–COL3 |
+| E11 | 工厂硬件与现场采集 Factory Hardware | HW1–HW3 |
 
-### E10 多端协同（含 3D）
+### E11 工厂硬件（结合 HARDWARE_BOOK）
 
-- **COL1** `collabWorld` — 可旋转 3D 五端地图,单据粒子在供应链上飞行
-- **COL2** `e2eProgress` — 五泳道端到端进度板(顺利 / 缺料 / 信用阻塞)
-- **COL3** `factoryTwin` — 3D 工厂工位孪生,工单令牌随报工前进
+- **HW1** `hwCatalog` — 15+ 类硬件图鉴(安灯/扫码/RFID/PLC/秤/标签机/拣选灯/AGV/视觉/IoT/考勤/边缘网关/语音拣选/扭矩工具…)映射到 ERP 单据
+- **HW2** `andonBoard` — 安灯状态机:拉绳 → 响应 → 关闭原因码 → 冻结报工
+- **HW3** `scanToPost` — 扫码/计件采集 → 边缘校验 → 幂等过账
 
 ## 技术 Stack
 
-无构建(no build):React 18 UMD + Babel standalone + marked + **Three.js r160**,浏览器里直接跑 JSX。进度/主题/语言保存在 `localStorage`(键 `erp_book_*`)。
-
-- `index.html` — 入口(CDN + 各 jsx)
-- `styles.css` / `erp.css` — 设计系统与沙盘样式
-- `i18n.jsx` / `data.jsx` / `viz.jsx` / `viz2.jsx` / `viz3.jsx` / `pages.jsx` / `app.jsx`
-- `content/<id>.<zh|en>.md` — 双语讲义(需 http 访问)
+无构建:React 18 UMD + Babel + marked + Three.js r160。进度在 `localStorage`(`erp_book_*`)。
 
 ## 运行 Run
 
@@ -40,6 +36,6 @@ A bilingual (zh/en) self-study site for ERP: **10 modules, 30 chapters**, each "
 python -m http.server 5670 --directory D:/webcode/ERP_BOOK
 ```
 
-打开 http://localhost:5670 — 3D 章建议从 http://localhost:5670/#/c/erp28 开始。
+打开 http://localhost:5670 — 硬件章从 http://localhost:5670/#/c/erp31 开始。
 
 MIT · 2026

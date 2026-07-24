@@ -601,12 +601,332 @@ function FactoryTwinViz() {
   );
 }
 
+/* ============================================================
+   HW1 · hwCatalog — factory hardware catalog mapped to ERP
+   ============================================================ */
+function HwCatalogViz() {
+  const L = useL();
+  const [zone, setZone] = React.useState("ALL");
+  const [sel, setSel] = React.useState("ANDON");
+  const ITEMS = [
+    { id: "ANDON", zone: "LINE", zh: "安灯系统", en: "Andon system",
+      hwZh: "灯塔/拉绳/工位屏/蜂鸣", enHw: "Tower / cord / HMI / buzzer",
+      evtZh: "呼叫、停机、原因码", evtEn: "Call, downtime, reason code",
+      erpZh: "冻结报工 · 停机进 OEE/成本中心", erpEn: "Freeze confirm · downtime → OEE/cost center",
+      bridgeZh: "HARDWARE: LED/蜂鸣器执行器 + 按钮消抖 + MCU", bridgeEn: "HARDWARE: LED/buzzer actuators + debounce + MCU" },
+    { id: "SCAN", zone: "WH", zh: "条码/二维码枪", en: "Barcode / QR scanner",
+      hwZh: "手持枪、固定式扫码头", enHw: "Handheld / fixed mount",
+      evtZh: "识别单号·物料·库位", evtEn: "ID doc · material · bin",
+      erpZh: "收发货过账、报工、盘点", erpEn: "GR/GI, confirm, cycle count",
+      bridgeZh: "HARDWARE: 光电传感 + UART/USB HID", bridgeEn: "HARDWARE: photo sensor + UART/USB HID" },
+    { id: "RFID", zone: "WH", zh: "RFID / UHF 门", en: "RFID / UHF gate",
+      hwZh: "门禁天线、托盘标签", enHw: "Portal antenna, pallet tags",
+      evtZh: "整托过门自动计数", evtEn: "Auto count on gate pass",
+      erpZh: "批量收发、在途校验", erpEn: "Bulk GR/GI, in-transit check",
+      bridgeZh: "HARDWARE: RF 前端 + 边缘网关", bridgeEn: "HARDWARE: RF front-end + edge gateway" },
+    { id: "TAB", zone: "LINE", zh: "工位平板 / HMI", en: "Station tablet / HMI",
+      hwZh: "工业平板、触控面板", enHw: "Industrial tablet, touch panel",
+      evtZh: "选工单、报工、看图纸", evtEn: "Pick WO, confirm, view drawings",
+      erpZh: "工序确认、质检记录", erpEn: "Op confirm, QI record",
+      bridgeZh: "HARDWARE: 显示屏 + 触摸 I/O + Wi-Fi SoC", bridgeEn: "HARDWARE: display + touch I/O + Wi-Fi SoC" },
+    { id: "PLC", zone: "LINE", zh: "PLC / 机床接口", en: "PLC / machine I/F",
+      hwZh: "PLC、CNC、OPC-UA/Modbus", enHw: "PLC, CNC, OPC-UA/Modbus",
+      evtZh: "计件脉冲、运行/停机信号", evtEn: "Piece pulse, run/stop signals",
+      erpZh: "自动报工、设备利用率", erpEn: "Auto confirm, equipment utilization",
+      bridgeZh: "HARDWARE: 数字 I/O + 工业总线(类比 UART/SPI 思想)", bridgeEn: "HARDWARE: digital I/O + fieldbus (UART/SPI mindset)" },
+    { id: "SCALE", zone: "QI", zh: "电子秤 / 检重秤", en: "Scale / checkweigher",
+      hwZh: "台秤、动态检重", enHw: "Bench / in-line checkweigher",
+      evtZh: "重量回传", evtEn: "Weight callback",
+      erpZh: "收货数量校验、BOM 耗用", erpEn: "GR qty check, BOM consumption",
+      bridgeZh: "HARDWARE: 应变片/称重传感 + ADC", bridgeEn: "HARDWARE: load-cell family + ADC" },
+    { id: "LBL", zone: "WH", zh: "标签打印机", en: "Label printer",
+      hwZh: "热敏/热转印条码机", enHw: "Thermal / TTR barcode printer",
+      evtZh: "打印物料/托盘/序列号标签", evtEn: "Print material/pallet/serial labels",
+      erpZh: "主数据条码、批次/序列闭环", erpEn: "Master barcodes, batch/serial loop",
+      bridgeZh: "HARDWARE: 热敏头驱动 + 串口/网络", bridgeEn: "HARDWARE: thermal-head drive + serial/net" },
+    { id: "PTL", zone: "WH", zh: "拣选灯 / 电子看板", en: "Pick-to-light / e-kanban",
+      hwZh: "货位灯、数码管、按钮确认", enHw: "Bay lights, digits, confirm buttons",
+      evtZh: "指引拣配并确认取货", evtEn: "Guide pick and confirm take",
+      erpZh: "交货拣配、电子看板补货", erpEn: "Delivery picking, e-kanban replenish",
+      bridgeZh: "HARDWARE: LED 矩阵 + 按钮 + 总线寻址", bridgeEn: "HARDWARE: LED matrix + buttons + bus addressing" },
+    { id: "AGV", zone: "LOG", zh: "AGV / AMR", en: "AGV / AMR",
+      hwZh: "自动搬运车、调度系统", enHw: "Mobile robots + fleet SW",
+      evtZh: "任务完成、库位到达", evtEn: "Task done, bin arrived",
+      erpZh: "库内转移过账、线边配送", erpEn: "Bin transfer, line-side delivery",
+      bridgeZh: "HARDWARE: 电机驱动 + 传感导航 + Wi-Fi", bridgeEn: "HARDWARE: motor drive + nav sensors + Wi-Fi" },
+    { id: "VISION", zone: "QI", zh: "视觉 / AOI", en: "Vision / AOI",
+      hwZh: "工业相机、光源、工控机", enHw: "Camera, lighting, IPC",
+      evtZh: "合格/不合格判定", evtEn: "Pass/fail judgment",
+      erpZh: "质检结果、废品入库原因", erpEn: "QI result, scrap reason",
+      bridgeZh: "HARDWARE: 图像传感 + 边缘算力", bridgeEn: "HARDWARE: imaging sensor + edge compute" },
+    { id: "IOT", zone: "LINE", zh: "IoT 环境/振动传感", en: "IoT env / vibration",
+      hwZh: "温湿度、振动、能耗表", enHw: "Temp/RH, vibration, power meters",
+      evtZh: "超限报警、预测性维护事件", evtEn: "Threshold alerts, PdM events",
+      erpZh: "设备工单、能耗进成本中心", erpEn: "Maint. orders, energy to cost center",
+      bridgeZh: "HARDWARE: DHT 类传感 + I²C/Modbus + ESP/网关", bridgeEn: "HARDWARE: DHT-class sensors + I²C/Modbus + ESP/gateway" },
+    { id: "CLOCK", zone: "INFRA", zh: "考勤 / 门禁", en: "Time clock / access",
+      hwZh: "刷卡、指纹、人脸闸机", enHw: "Badge, fingerprint, face gate",
+      evtZh: "出勤、进入受控区", evtEn: "Attendance, controlled-area entry",
+      erpZh: "工时归集、关键工序身份校验", erpEn: "Labor collection, station identity check",
+      bridgeZh: "HARDWARE: 生物特征传感 + 安全存储", bridgeEn: "HARDWARE: biometric sense + secure storage" },
+    { id: "EDGE", zone: "INFRA", zh: "边缘网关 / 工控机", en: "Edge gateway / IPC",
+      hwZh: "协议转换、本地缓存", enHw: "Protocol convert, local buffer",
+      evtZh: "汇聚现场信号、断网续传", evtEn: "Aggregate signals, store-and-forward",
+      erpZh: "保证幂等写入 MES/ERP", erpEn: "Idempotent writes to MES/ERP",
+      bridgeZh: "HARDWARE: 多总线 MCU/工控机", bridgeEn: "HARDWARE: multi-bus MCU/IPC" },
+    { id: "VOICE", zone: "WH", zh: "语音拣选耳机", en: "Voice-picking headset",
+      hwZh: "头戴麦、语音引擎", enHw: "Headset + speech engine",
+      evtZh: "听指令拣货并口述确认", evtEn: "Hear pick cmds, speak confirm",
+      erpZh: "交货拣配确认", erpEn: "Delivery pick confirm",
+      bridgeZh: "HARDWARE: 麦/喇叭 + 边缘 ASR", bridgeEn: "HARDWARE: mic/speaker + edge ASR" },
+    { id: "TORQUE", zone: "LINE", zh: "智能扭矩工具", en: "Smart torque tool",
+      hwZh: "带传感扳手/电批", enHw: "Sensor wrench / electric driver",
+      evtZh: "扭矩达标/未达标", evtEn: "Torque OK / NOK",
+      erpZh: "装配工序强制质检点", erpEn: "Mandatory assembly QI point",
+      bridgeZh: "HARDWARE: 力传感 + 无线回传", bridgeEn: "HARDWARE: force sense + wireless backhaul" },
+  ];
+  const ZONES = [
+    { v: "ALL", zh: "全部", en: "All" },
+    { v: "LINE", zh: "产线", en: "Line" },
+    { v: "WH", zh: "仓储", en: "Warehouse" },
+    { v: "QI", zh: "质检", en: "QI" },
+    { v: "LOG", zh: "物流", en: "Logistics" },
+    { v: "INFRA", zh: "基础设施", en: "Infra" },
+  ];
+  const list = ITEMS.filter((x) => zone === "ALL" || x.zone === zone);
+  const cur = ITEMS.find((x) => x.id === sel) || list[0];
+  return (
+    <div>
+      <div className="erp-stage">
+        <div className="erp-hw-zones">
+          {ZONES.map((z) => (
+            <button key={z.v} className={`erp-3d-chip ${zone === z.v ? "on" : ""}`}
+              onClick={() => setZone(z.v)}>{L(z.zh, z.en)}</button>
+          ))}
+        </div>
+        <div className="erp-hw-grid">
+          {list.map((it) => (
+            <button key={it.id} className={`erp-hw-card ${cur && cur.id === it.id ? "sel" : ""}`}
+              onClick={() => setSel(it.id)}>
+              <span className="code mono">{it.id}</span>
+              <strong>{L(it.zh, it.en)}</strong>
+              <span className="zone mono">{it.zone}</span>
+            </button>
+          ))}
+        </div>
+        {cur && (
+          <div className="erp-doc-detail" style={{ marginTop: 14 }}>
+            <strong>{L(cur.zh, cur.en)}</strong>
+            <div className="erp-hw-kv">
+              <div><span className="k">{L("硬件形态", "Hardware")}</span><span>{L(cur.hwZh, cur.enHw)}</span></div>
+              <div><span className="k">{L("现场事件", "Floor event")}</span><span>{L(cur.evtZh, cur.evtEn)}</span></div>
+              <div><span className="k">{L("写入 ERP/MES", "Writes ERP/MES")}</span><span>{L(cur.erpZh, cur.erpEn)}</span></div>
+              <div><span className="k">{L("HARDWARE_BOOK 桥", "HARDWARE_BOOK bridge")}</span><span>{L(cur.bridgeZh, cur.bridgeEn)}</span></div>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="viz-readout">
+        {L(`图鉴共 ${ITEMS.length} 类常见工厂硬件。优先「扫码枪 + 工位屏 + 安灯 + 标签机」往往就能让报工与库存不再靠回忆;PLC/RFID/AGV 是第二波自动化。点卡片看它到底写进哪张单。`,
+           `${ITEMS.length} common plant hardware classes. A first wave of scanner + station screen + andon + labeler often stops confirmation-by-memory; PLC/RFID/AGV is wave two. Click a card to see which document it writes.`)}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   HW2 · andonBoard — andon pull → escalate → ERP freeze
+   ============================================================ */
+function AndonBoardViz() {
+  const L = useL();
+  const [state, setState] = React.useState("GREEN");
+  const [reason, setReason] = React.useState("MAT");
+  const [mins, setMins] = React.useState(0);
+  const REASONS = {
+    MAT: { zh: "缺料", en: "Material shortage", esc: 2 },
+    EQ: { zh: "设备故障", en: "Equipment fault", esc: 2 },
+    QL: { zh: "质量异常", en: "Quality issue", esc: 3 },
+    MAN: { zh: "人员不足", en: "Manpower short", esc: 1 },
+  };
+  const COLORS = {
+    GREEN: { bg: "#2f6b4f", zh: "正常生产", en: "Running" },
+    CALL: { bg: "#c45c3e", zh: "呼叫中 · 等待响应", en: "Calling · awaiting ack" },
+    ACK: { bg: "#b8892d", zh: "已响应 · 处置中", en: "Acknowledged · fixing" },
+    FIX: { bg: "#2f6b4f", zh: "已关闭 · 恢复生产", en: "Cleared · running" },
+  };
+  React.useEffect(() => {
+    if (state !== "CALL" && state !== "ACK") return undefined;
+    const id = setInterval(() => setMins((m) => m + 1), 800);
+    return () => clearInterval(id);
+  }, [state]);
+  const pull = () => { setState("CALL"); setMins(0); };
+  const ack = () => setState("ACK");
+  const clear = () => setState("FIX");
+  const reset = () => { setState("GREEN"); setMins(0); };
+  const c = COLORS[state === "FIX" ? "GREEN" : state];
+  const r = REASONS[reason];
+  const freeze = state === "CALL" || state === "ACK";
+  return (
+    <div>
+      <div className="erp-stage">
+        <div className="erp-andon">
+          <div className="erp-andon-tower">
+            {["#c45c3e", "#b8892d", "#2f6b4f"].map((col, i) => (
+              <div key={i} className="erp-andon-lamp" style={{
+                background: (state === "CALL" && i === 0) || (state === "ACK" && i === 1) || ((state === "GREEN" || state === "FIX") && i === 2) ? col : "#3a3a3a",
+                boxShadow: ((state === "CALL" && i === 0) || (state === "ACK" && i === 1) || ((state === "GREEN" || state === "FIX") && i === 2))
+                  ? `0 0 18px ${col}` : "none",
+              }} />
+            ))}
+            <div className="erp-andon-pole" />
+          </div>
+          <div className="erp-andon-panel" style={{ borderColor: c.bg }}>
+            <div className="mono" style={{ letterSpacing: "0.12em", color: "var(--muted)" }}>LINE-A3 · WO-5521</div>
+            <div style={{ fontFamily: "Noto Serif SC, serif", fontSize: 28, marginTop: 6, color: c.bg }}>{L(c.zh, c.en)}</div>
+            <div className="erp-andon-stats">
+              <div><span className="k">{L("停机", "Downtime")}</span><strong>{mins}</strong><span className="u">{L("分钟(模拟)", "min (sim)")}</span></div>
+              <div><span className="k">{L("原因", "Reason")}</span><strong>{L(r.zh, r.en)}</strong></div>
+              <div><span className="k">{L("升级级", "Escalation")}</span><strong>L{r.esc}</strong></div>
+            </div>
+            <div className="erp-posting" style={{ marginTop: 10 }}>
+              {freeze
+                ? L("ERP/MES: 报工入口已冻结 · 工单进度条停止 · 停机工时写入成本中心",
+                    "ERP/MES: confirmations frozen · WO progress stopped · downtime to cost center")
+                : L("ERP/MES: 允许报工 · 进度可前进", "ERP/MES: confirmations allowed · progress may advance")}
+            </div>
+          </div>
+        </div>
+        <div className="erp-btnrow">
+          <button className="btn erp-minibtn" onClick={pull} disabled={state === "CALL" || state === "ACK"}>{L("拉安灯", "Pull andon")}</button>
+          <button className="btn erp-minibtn" onClick={ack} disabled={state !== "CALL"}>{L("班长响应", "Lead ack")}</button>
+          <button className="btn erp-minibtn" onClick={clear} disabled={state !== "ACK"}>{L("关闭安灯", "Clear andon")}</button>
+          <button className="btn erp-minibtn" onClick={reset}>{L("复位绿灯", "Reset green")}</button>
+        </div>
+      </div>
+      <div className="viz-ctrl">
+        <Choice label={L("停机原因码", "Downtime reason")} value={reason} onChange={setReason}
+          options={Object.keys(REASONS).map((k) => ({ v: k, l: L(REASONS[k].zh, REASONS[k].en) }))} />
+      </div>
+      <div className="viz-readout">
+        {L("安灯的价值不在「灯亮了」,而在状态机写入系统:呼叫未响应要升级,关闭必须带原因码,红灯期间禁止虚报工。否则 OEE 与客户交期都是假数。",
+           "Andon’s value is not the lit lamp — it is the state machine written to the system: unanswered calls escalate, clears need reason codes, and fake confirms are blocked while red. Otherwise OEE and customer dates are fiction.")}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   HW3 · scanToPost — hardware capture → ERP posting chain
+   ============================================================ */
+function ScanToPostViz() {
+  const L = useL();
+  const [mode, setMode] = React.useState("GR");
+  const [step, setStep] = React.useState(0);
+  const [log, setLog] = React.useState([]);
+  const MODES = {
+    GR: {
+      zh: "扫码收货", en: "Scan goods receipt",
+      steps: [
+        { zh: "RF 枪扫描 PO 条码", en: "RF gun scans PO barcode", sys: "PO-7781" },
+        { zh: "扫描物料/托盘标签", en: "Scan material / pallet label", sys: "ROH-WHEEL × 100" },
+        { zh: "边缘校验:PO 行、数量容差、质检标识", en: "Edge validate: PO line, qty tolerance, QI flag", sys: "OK · QI required" },
+        { zh: "幂等写入 ERP 收货(101)", en: "Idempotent ERP GR (mvt 101)", sys: "GR → QI stock + GR/IR" },
+      ],
+    },
+    GI: {
+      zh: "扫码发料", en: "Scan material issue",
+      steps: [
+        { zh: "扫描生产工单", en: "Scan production order", sys: "WO-5521" },
+        { zh: "扫描组件条码与库位", en: "Scan component + bin", sys: "ROH-WHEEL @ A-01" },
+        { zh: "校验BOM与可用库存", en: "Check BOM & available stock", sys: "BOM match · ATP OK" },
+        { zh: "过账发料 · 成本进工单", en: "Post issue · cost to WO", sys: "GI → WIP / order cost" },
+      ],
+    },
+    CNF: {
+      zh: "计件/扫码报工", en: "Piece / scan confirm",
+      steps: [
+        { zh: "PLC 计件脉冲或扫流转卡", en: "PLC piece pulse or scan traveler", sys: "pulse × 12" },
+        { zh: "工位终端确认合格/工时", en: "Station confirms yield / hours", sys: "good 12 · 0.8h" },
+        { zh: "网关聚合并去重(同一脉冲不双记)", en: "Gateway aggregate & dedupe", sys: "idempotency key" },
+        { zh: "ERP 工序确认 · 倒冲材料", en: "ERP op confirm · backflush", sys: "CNF → backflush + hours" },
+      ],
+    },
+    CC: {
+      zh: "循环盘点", en: "Cycle count",
+      steps: [
+        { zh: "扫描库位码", en: "Scan bin code", sys: "BIN A-01" },
+        { zh: "扫描实物标签并录入实盘数", en: "Scan label & enter counted qty", sys: "count 96" },
+        { zh: "与账面比较,超阈值走审批", en: "Compare to book; over-threshold → approve", sys: "book 100 · Δ -4" },
+        { zh: "过账盘亏 · 财务同步", en: "Post write-off · finance sync", sys: "inventory adj. posting" },
+      ],
+    },
+  };
+  const m = MODES[mode];
+  const fire = () => {
+    if (step >= m.steps.length) return;
+    const s = m.steps[step];
+    setLog((prev) => [`${new Date().toLocaleTimeString()}  ${L(s.zh, s.en)} → ${s.sys}`, ...prev].slice(0, 8));
+    setStep((x) => x + 1);
+  };
+  const reset = () => { setStep(0); setLog([]); };
+  React.useEffect(() => { reset(); }, [mode]);
+  return (
+    <div>
+      <div className="erp-stage">
+        <div className="erp-scan-pipe">
+          {["HARDWARE", "EDGE", "MES/ERP", "LEDGER"].map((lab, i) => (
+            <React.Fragment key={lab}>
+              {i > 0 && <div className="erp-flow-arrow">→</div>}
+              <div className={`erp-doc ${step > i ? "on" : ""} ${step === i ? "now" : ""}`} style={{ cursor: "default" }}>
+                <div className="d-code">{lab}</div>
+                <div className="d-name">{i === 0 ? L("采集", "Capture") : i === 1 ? L("校验/缓存", "Validate/buffer") : i === 2 ? L("事务", "Transaction") : L("库存·成本", "Stock·cost")}</div>
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
+        <div className="erp-scan-steps">
+          {m.steps.map((s, i) => (
+            <div key={i} className={`erp-check c-item ${i < step ? "done" : ""} ${i === step ? "now" : ""}`}>
+              <div className="c-box">{i < step ? "✓" : String(i + 1)}</div>
+              <div>
+                <div className="c-name">{L(s.zh, s.en)}</div>
+                <div className="c-sub mono">{s.sys}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="erp-btnrow">
+          <button className="btn btn-accent erp-minibtn" onClick={fire} disabled={step >= m.steps.length}>
+            {step >= m.steps.length ? L("本闭环完成", "Loop complete") : L("模拟下一次采集 →", "Simulate next capture →")}
+          </button>
+          <button className="btn erp-minibtn" onClick={reset}>{L("重置", "Reset")}</button>
+        </div>
+        {log.length > 0 && <div className="erp-log">{log.join("\n")}</div>}
+      </div>
+      <div className="viz-ctrl">
+        <Choice label={L("采集闭环", "Capture loop")} value={mode} onChange={setMode}
+          options={Object.keys(MODES).map((k) => ({ v: k, l: L(MODES[k].zh, MODES[k].en) }))} />
+      </div>
+      <div className="viz-readout">
+        {L("好的现场采集 = 硬件事件 + 边缘校验 + 幂等键。少了校验会把脏数据写进库存;少了幂等会在弱网下双倍过账。这与 HARDWARE_BOOK 里「先读对信号,再驱动执行器」是同一纪律。",
+           "Good floor capture = hardware event + edge validation + idempotency key. Skip validation and dirty stock lands; skip idempotency and weak networks double-post. Same discipline as HARDWARE_BOOK: read the signal right before you drive the actuator.")}
+      </div>
+    </div>
+  );
+}
+
 /* ---- register into viz2's VIZ map ---- */
 if (typeof VIZ !== "undefined") {
   VIZ.collabWorld = () => <CollabWorldViz />;
   VIZ.e2eProgress = () => <E2eProgressViz />;
   VIZ.factoryTwin = () => <FactoryTwinViz />;
+  VIZ.hwCatalog = () => <HwCatalogViz />;
+  VIZ.andonBoard = () => <AndonBoardViz />;
+  VIZ.scanToPost = () => <ScanToPostViz />;
 }
 window.CollabWorldViz = CollabWorldViz;
 window.E2eProgressViz = E2eProgressViz;
 window.FactoryTwinViz = FactoryTwinViz;
+window.HwCatalogViz = HwCatalogViz;
+window.AndonBoardViz = AndonBoardViz;
+window.ScanToPostViz = ScanToPostViz;

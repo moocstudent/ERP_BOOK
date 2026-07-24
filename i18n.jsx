@@ -69,8 +69,8 @@ const UI = {
   hero_l2a:    { zh: "再讲清", en: "then nail the" },
   hero_l2b:    { zh: "系统。", en: "system." },
   hero_sub:    {
-    zh: "一站式 ERP 自学地图:从 MRP 与一体化思想,到主数据、三大业务闭环、库存与业财、实施集成与角色视角,再到供应商·工厂·办公室·仓库·客户的多端协同——含可旋转的 3D 流转沙盘。每一章先玩业务沙盘,再读解释。共 {M} 个模块、{C} 章。",
-    en: "A self-study map for ERP: from MRP and integration, through master data, the three business loops, inventory and finance, implementation and roles, to multi-party sync across supplier · plant · office · warehouse · customer — including rotatable Three.js flow sandboxes. Every chapter: sandbox first, then explanation. {M} modules, {C} chapters.",
+    zh: "一站式 ERP 自学地图:从 MRP 与业务闭环,到角色与多端 3D 协同,再到工厂安灯/扫码/PLC 等硬件如何把现场写进系统——并桥接 HARDWARE_BOOK。共 {M} 个模块、{C} 章。",
+    en: "A self-study ERP map: from MRP and business loops, through roles and multi-party 3D sync, to factory andon/scanners/PLCs that write the floor into the system — bridged to HARDWARE_BOOK. {M} modules, {C} chapters.",
   },
   cta_start:   { zh: "从第一章开始 →", en: "Start chapter 1 →" },
   cta_howto:   { zh: "如何使用", en: "How it works" },
@@ -162,8 +162,8 @@ const UI = {
   about_sub:    { zh: "把 ERP 讲成「沙盘 + 解释」,而不只是软件按钮说明书。", en: "Teach ERP as sandbox + explanation, not a manual of software buttons." },
   about_h1: { zh: "这是什么", en: "What this is" },
   about_p1: {
-    zh: "一个面向自学者的 ERP 教程,共 {M} 个模块、{C} 章。从 MRP 到云 ERP,经主数据与三大闭环、库存与业财、实施与角色视角,并以 3D/进度板展示供应商、工厂、办公室、仓库、客户如何共享同一条单据进度。",
-    en: "A self-study ERP course — {M} modules, {C} chapters. From MRP to cloud ERP through master data, the three loops, inventory and finance, implementation and roles, plus 3D/progress boards showing how supplier, plant, office, warehouse and customer share one document progress bar.",
+    zh: "一个面向自学者的 ERP 教程,共 {M} 个模块、{C} 章。覆盖主数据与三大闭环、财务与实施、角色与多端协同,以及工厂硬件(安灯、扫码、RFID、PLC 等)如何支撑现场采集——概念上与 HARDWARE_BOOK 的传感/总线互相参照。",
+    en: "A self-study ERP course — {M} modules, {C} chapters. Covers master data and the three loops, finance and implementation, roles and multi-party sync, plus factory hardware (andon, scanners, RFID, PLC…) that powers floor capture — cross-referenced with HARDWARE_BOOK sensing and buses.",
   },
   about_p1b: { zh: "全部内容中英双语,支持浅色/深色主题,进度保存在你自己的浏览器里,无需注册。", en: "Everything is bilingual (Chinese/English), supports light and dark themes, and keeps your progress in your own browser — no signup." },
   about_h2: { zh: "「沙盘与解释」是什么意思", en: "What 'sandbox & explanation' means" },
@@ -178,8 +178,8 @@ const UI = {
   },
   about_h4: { zh: "如何使用", en: "How to use it" },
   about_p4: {
-    zh: "按路线图学:先全景与主数据,再采购/销售/生产/库存/财务,然后实施与角色,最后用 E10 的 3D 协同与进度板把「单据」放回五端现场。每章先沙盘后讲义。",
-    en: "Follow the roadmap: foundations and master data, then purchasing/sales/production/inventory/finance, then implementation and roles, and finish with E10’s 3D collaboration and progress boards that put documents back onto five physical ends. Sandbox first, notes second.",
+    zh: "按路线图学:业务闭环 → 角色 → 多端协同 → 工厂硬件采集。每章先沙盘后讲义。硬件章可与 HARDWARE_BOOK 对照阅读。",
+    en: "Follow the roadmap: business loops → roles → multi-party sync → factory hardware capture. Sandbox first, notes second. Hardware chapters pair with HARDWARE_BOOK.",
   },
 };
 
